@@ -1,33 +1,112 @@
+import datetime
+import re
+import semver
+
 from .element import KACLElement
 from .version import KACLVersion
 from .parser import KACLParser
 from .config import KACLConfig
-
-import re
-import datetime
+from.validation import KACLValidation
 
 
 class KACLDocument:
-    def __init__(self, content="", headers=[], versions=[], config=KACLConfig()):
+    def __init__(self, content="", headers=[], versions=[], link_references=None, config=KACLConfig()):
         self.__content = content
         self.__headers = headers
         self.__versions = versions
+        self.__link_references = link_references
+        if not self.__link_references:
+            self.__link_references = dict()
+        self.__config = config
 
     def validate(self):
-        # 1. assume only one header
+        validation = KACLValidation()
+        # 1. assume only one header and starts on first line
+        if len(self.__headers) == 0:
+            validation.add_error(
+                text=None,
+                line_number=None,
+                error_message="No 'Changelog' Heading found.")
+        else:
+            if self.header().raw() != self.header().raw().lstrip():
+                validation.add_error(
+                    text=None,
+                    line_number=None,
+                    error_message="Changelog heading not placed on first line.")
+
+        if len(self.__headers) > 1:
+            for header in self.__headers[1:]:
+                validation.add_error(
+                    text=self.header().raw(),
+                    line_number=self.header().line_number(),
+                    error_message="Unexpected top-level heading found."
+                )
+
         # 1.1 assume header title is in allowed list of header titles
-        # 1.1.1 check case sensitivity
+        if self.header().title() not in self.__config.allowed_header_titles():
+            validation.add_error(
+                text=self.header().raw().strip(),
+                line_number=self.header().line_number(),
+                error_message=f"Header title not valid. Options are [{','.join(self.__config.allowed_header_titles())}]"
+            )
 
         # 2. assume 'unreleased' version is available
-        # 2.1 check for case sensitivity
+        if self.get('Unreleased') == None:
+            validation.add_error(
+                text=None,
+                line_number=None,
+                error_message="'Unreleased' section is missing from the Changelog"
+            )
 
         # 3. assume versions in valid format
+        versions = self.versions()
+        for v in versions:
+            if "Unreleased" != v.version():
+                raw = v.raw()
+                regex = f'#\s\[{KACLParser.semver_regex}\]'
+                if v.link():
+                    regex = f'#\s\[{KACLParser.semver_regex}\]'
+                if not KACLParser.parse_sem_ver(raw, regex):
+                    validation.add_error(
+                        text=raw.strip(),
+                        line_number=v.line_number(),
+                        error_message=f"Version is not a valid semantic version."
+                    )
+
         # 3.1 assume versions in descending order
+        for i in range(len(versions)-1):
+            try:
+                v0 = versions[i]
+                v1 = versions[i+1]
+                if semver.compare(v0.version(), v1.version()) < 1:
+                    validation.add_error(
+                        text=v1.raw().strip(),
+                        line_number=v1.line_number(),
+                        error_message="Versions are not in descending order."
+                    )
+            except:
+                pass
+
         # 3.2 assume versions have date
         # 3.3 check that only allowed sections are in the version
         # 3.4 check that only list elements are in the sections
 
-        pass
+        # 4 link references
+        # 4.1 check that there are only linked references
+        version_strings = [v.version() for v in versions]
+        for v, link in self.__link_references.items():
+            if v not in version_strings:
+                validation.add_error(
+                    text=f'[{v}]: {link}',
+                    line_number=None,
+                    error_message=f"Link not referenced anywhere in the document"
+                )
+
+        return validation
+
+    def is_valid(self):
+        validation_results = self.validate()
+        return validation_results.valid()
 
     def add(self, section, content):
         unreleased_version = self.get('Unreleased')
@@ -44,7 +123,7 @@ class KACLDocument:
 
         # convert unreleased version to version
         self.__versions.insert(0, KACLVersion(version=version,
-                                              link=link,
+                                              link=KACLElement(title=version, body=link),
                                               date=datetime.datetime.now().strftime("%Y-%m-%d"),
                                               sections=unreleased_version.sections()))
         # add new unreleased section
@@ -88,4 +167,4 @@ class KACLDocument:
         for v in versions:
             v.set_link(link_references.get(v.version(), None))
 
-        return KACLDocument(content=text, headers=headers, versions=versions)
+        return KACLDocument(content=text, headers=headers, versions=versions, link_references=link_references)

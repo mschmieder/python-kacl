@@ -87,3 +87,13 @@ class TestKacl(TestCase):
         self.assertIsNotNone(version)
 
         self.assertIn(msg, version.changes('Added').items())
+
+
+    def test_validate(self):
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0_invalid.md")
+        changelog = kacl.load(changlog_file)
+
+        validation = changelog.validate()
+
+        self.assertTrue(changelog.is_valid())

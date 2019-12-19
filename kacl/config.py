@@ -9,7 +9,7 @@ class KACLConfig:
                                            "Security"]
         self.__case_sensitive = True
 
-    def isCaseSensitive(self):
+    def is_case_sensitive(self):
         return self.__case_sensitive
 
     def allowed_header_titles(self):
