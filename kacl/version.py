@@ -4,14 +4,22 @@ from .parser import KACLParser
 
 import re
 
-semver_regex = r'(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?'
-
 class KACLVersion(KACLElement):
-    def __init__(self, element):
+    def __init__(self, element, link=None):
         KACLElement.__init__(self, title=element.title(), body=element.body(), start=element.start(), end=element.end())
         self.__date = None
         self.__version = None
         self.__changes = None
+        self.__link = link
+
+    def link(self):
+        return self.__link
+
+    def set_link(self, link):
+        self.__link = link
+
+    def has_link_reference(self):
+        return (self.__link != None)
 
     def date(self):
         if self.__date:
@@ -29,9 +37,11 @@ class KACLVersion(KACLElement):
             return self.__version
         else:
             title = self.title()
-            m = re.search(semver_regex, title)
-            if m:
-                self.__version = m.group().strip()
+            version = KACLParser.parse_sem_ver(title)
+            if version:
+                self.__version = version
+            elif 'unreleased' in title.lower():
+                self.__version = "Unreleased"
 
         return self.__version
 

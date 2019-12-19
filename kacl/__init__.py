@@ -1,4 +1,5 @@
 from .document import *
+from .serializer import *
 
 def load(file):
     """
@@ -12,5 +13,5 @@ def load(file):
         finally:
             f.close()
 
-def parse(stream):
-    pass
+def dump(document):
+    return KACLMarkdownSerializer().serialize(document)

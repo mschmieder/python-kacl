@@ -15,9 +15,9 @@ class KACLChanges(KACLElement):
             body = self.body()
 
             # first bring order into the chaos by bringing all items into one line
-            clean_body = re.sub(r'\n\s+', '', body)
-            items = ("\n"+clean_body).split('\n-')
-            self.__items = [ x.strip() for x in items if len(x.strip()) ]
+            #clean_body = re.sub(r'\n\s+', '', body)
+            items = ("\n"+body).split('\n-')
+            self.__items = [ x.strip() for x in items if len(x.strip()) > 0 ]
         return self.__items
 
 

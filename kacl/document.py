@@ -2,6 +2,7 @@ from .element import KACLElement
 from .version import KACLVersion
 from .parser import KACLParser
 from .config import KACLConfig
+
 import re
 
 class KACLDocument:
@@ -38,11 +39,11 @@ class KACLDocument:
             return res[0]
         return None
 
-    def dump(self, file=None):
-        pass
+    def header(self):
+        return self.__headers[0]
 
     def title(self):
-        if self.__headers:
+        if self.__headers[0]:
             return self.__headers[0].title()
         return None
 
@@ -51,8 +52,22 @@ class KACLDocument:
 
     @staticmethod
     def parse(text):
-        headers = KACLParser.parse_header(text, 1)
-        versions = KACLParser.parse_header(text, 2)
-        versions = [ KACLVersion(x) for x in versions ]
+        # First check if there are link references and split the document where they begin
+        link_reference_begin, link_references = KACLParser.parse_link_references(text)
+
+        changelog_body = text
+        if link_reference_begin:
+            changelog_body = text[:link_reference_begin]
+
+        # read header
+        headers = KACLParser.parse_header(changelog_body, 1, 2)
+
+        # read versions
+        versions = KACLParser.parse_header(changelog_body, 2, 2)
+        versions = [ KACLVersion(element=x) for x in versions ]
+
+        # set link references into versions if available
+        for v in versions:
+            v.set_link(link_references.get(v.version(), None))
 
         return KACLDocument(content=text, headers=headers, versions=versions)
