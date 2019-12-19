@@ -1,9 +1,9 @@
 class KACLElement:
-    def __init__(self, title, body, start, end):
+    def __init__(self, title="", body="", start=None, end=None):
         self.__title = title
         self.__body = body
-        self.__start = None
-        self.__end = None
+        self.__start = start
+        self.__end = end
 
     def start(self):
         return self.__start

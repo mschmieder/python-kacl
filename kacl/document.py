@@ -4,9 +4,11 @@ from .parser import KACLParser
 from .config import KACLConfig
 
 import re
+import datetime
+
 
 class KACLDocument:
-    def __init__(self, content, headers, versions, config=KACLConfig()):
+    def __init__(self, content="", headers=[], versions=[], config=KACLConfig()):
         self.__content = content
         self.__headers = headers
         self.__versions = versions
@@ -28,16 +30,31 @@ class KACLDocument:
         pass
 
     def add(self, section, content):
-        pass
+        unreleased_version = self.get('Unreleased')
+        unreleased_version.add(section, content)
 
-    def release(self, version):
-        pass
+    def release(self, version, link=None):
+        # get current unreleased changes
+        unreleased_version = self.get('Unreleased')
+        unreleased_version.set_version(version)
+        unreleased_version.set_link(link)
+
+        # remove current unrelease version from list
+        self.__versions.pop(0)
+
+        # convert unreleased version to version
+        self.__versions.insert(0, KACLVersion(version=version,
+                                              link=link,
+                                              date=datetime.datetime.now().strftime("%Y-%m-%d"),
+                                              sections=unreleased_version.sections()))
+        # add new unreleased section
+        self.__versions.insert(0, KACLVersion(version='Unreleased'))
 
     def get(self, version):
-        res = [ x for x in self.__versions if x.version() and version in x.version() ]
+        res = [x for x in self.__versions if x.version()
+               and version in x.version()]
         if res and len(res):
             return res[0]
-        return None
 
     def header(self):
         return self.__headers[0]
@@ -53,7 +70,8 @@ class KACLDocument:
     @staticmethod
     def parse(text):
         # First check if there are link references and split the document where they begin
-        link_reference_begin, link_references = KACLParser.parse_link_references(text)
+        link_reference_begin, link_references = KACLParser.parse_link_references(
+            text)
 
         changelog_body = text
         if link_reference_begin:
@@ -64,7 +82,7 @@ class KACLDocument:
 
         # read versions
         versions = KACLParser.parse_header(changelog_body, 2, 2)
-        versions = [ KACLVersion(element=x) for x in versions ]
+        versions = [KACLVersion(element=x) for x in versions]
 
         # set link references into versions if available
         for v in versions:

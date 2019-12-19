@@ -4,12 +4,17 @@ from .parser import KACLParser
 
 import re
 
+
 class KACLVersion(KACLElement):
-    def __init__(self, element, link=None):
-        KACLElement.__init__(self, title=element.title(), body=element.body(), start=element.start(), end=element.end())
-        self.__date = None
-        self.__version = None
-        self.__changes = None
+    def __init__(self, element=KACLElement(), version="", date="", sections=None, link=None):
+        KACLElement.__init__(self, title=element.title(
+        ), body=element.body(), start=element.start(), end=element.end())
+        self.__date = date
+        self.__version = version
+        if sections is None:
+            self.__sections = dict()
+        else:
+            self.__sections = sections
         self.__link = link
 
     def link(self):
@@ -22,9 +27,7 @@ class KACLVersion(KACLElement):
         return (self.__link != None)
 
     def date(self):
-        if self.__date:
-            return self.__date
-        else:
+        if not len(self.__date):
             title = self.title()
             m = re.search(r'\d\d\d\d-\d\d-\d\d', title)
             if m:
@@ -33,9 +36,7 @@ class KACLVersion(KACLElement):
         return self.__date
 
     def version(self):
-        if self.__version:
-            return self.__version
-        else:
+        if not len(self.__version):
             title = self.title()
             version = KACLParser.parse_sem_ver(title)
             if version:
@@ -45,16 +46,17 @@ class KACLVersion(KACLElement):
 
         return self.__version
 
+    def set_version(self, version):
+        self.__version = version
+
     def sections(self):
-        if self.__changes:
-            return self.__changes
-        else:
-            self.__changes = dict()
+        if not len(self.__sections) and len(self.body().strip()):
+            self.__sections = dict()
             sections = KACLParser.parse_header(self.body(), 3)
             for section in sections:
                 sec = KACLChanges(section)
-                self.__changes[sec.title()] = sec
-        return self.__changes
+                self.__sections[sec.title()] = sec
+        return self.__sections
 
     def changes(self, section):
         sections = self.sections()
@@ -62,3 +64,9 @@ class KACLVersion(KACLElement):
             return sections[section]
 
         return None
+
+    def add(self, section, change):
+        if section not in self.__sections:
+            self.__sections[section] = KACLChanges(KACLElement(
+                title=section, body="", start=None, end=None))
+        self.__sections[section].add(change)

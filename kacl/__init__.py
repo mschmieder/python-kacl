@@ -6,12 +6,17 @@ def load(file):
     Parse the first YAML document in a stream
     and produce the corresponding Python object.
     """
+    doc = None
     with open(file, 'r') as f:
         document = f.read()
         try:
-            return KACLDocument.parse(document)
+            doc = KACLDocument.parse(document)
         finally:
             f.close()
+    return doc
+
+def parse(text):
+    return KACLDocument.parse(text)
 
 def dump(document):
     return KACLMarkdownSerializer().serialize(document)
