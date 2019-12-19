@@ -8,7 +8,7 @@ class KACLParser:
     semver_regex = r'(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?'
 
     @staticmethod
-    def parse_header(text, start_depth, end_depth=None):
+    def parse_header(text, start_depth, end_depth=None, line_offset=0):
         if not end_depth:
             end_depth = start_depth
 
@@ -21,7 +21,11 @@ class KACLParser:
             title = match.group(2).strip()
             start = match.start()
             end = match.end()
-            line_number = text[:start].count('\n')+1
+            line_number = text[:start].count('\n')+line_offset
+            if match.group()[0] == '\n':
+                line_number += 2
+            else:
+                line_number += 1
 
             next_match = re.search(reg_expr_end, text[end:])
             body = None

@@ -21,7 +21,7 @@ class KACLValidation():
     def is_valid(self):
         return (len(self.__validation_errors) == 0)
 
-    def validation_errors(self):
+    def errors(self):
         return self.__validation_errors
 
     def add_error(self, text, line_number, error_message):

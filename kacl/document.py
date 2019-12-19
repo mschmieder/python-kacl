@@ -37,9 +37,9 @@ class KACLDocument:
         if len(self.__headers) > 1:
             for header in self.__headers[1:]:
                 validation.add_error(
-                    text=self.header().raw(),
-                    line_number=self.header().line_number(),
-                    error_message="Unexpected top-level heading found."
+                    text=header.raw(),
+                    line_number=header.line_number(),
+                    error_message="Unexpected additional top-level heading found."
                 )
 
         # 1.1 assume header title is in allowed list of header titles
@@ -87,9 +87,41 @@ class KACLDocument:
             except:
                 pass
 
-        # 3.2 assume versions have date
+        # 3.2 assume versions have a valid date
+        for v in versions:
+            if "Unreleased" != v.version():
+                if not v.date() or len(v.date()) < 1:
+                    validation.add_error(
+                        text=v.raw().strip(),
+                        line_number=v.line_number(),
+                        error_message="Versions need to be decorated with a release date 'YYYY-MM-DD'"
+                    )
+                if v.date() and not re.match(r'\d\d\d\d-[0-1][0-9]-[0-3][0-9]', v.date()):
+                    validation.add_error(
+                        text=v.raw().strip(),
+                        line_number=v.line_number(),
+                        error_message="Date does not match format 'YYYY-MM-DD'"
+                    )
+
         # 3.3 check that only allowed sections are in the version
+            sections = v.sections()
+            for title, element in sections.items():
+                if title not in self.__config.allowed_version_sections():
+                    validation.add_error(
+                        text=element.raw().strip(),
+                        line_number=element.line_number(),
+                        error_message=f'"{title}" not a valid section for a version. Options are [{",".join( self.__config.allowed_version_sections())}]'                    )
         # 3.4 check that only list elements are in the sections
+                # 3.4.1 bring everything into a single line
+                body = element.body()
+                body_clean = re.sub(r'\n\s+','', body)
+                lines = body_clean.split('\n')
+                non_list_lines = [ x for x in lines if not x.strip().startswith('-') and len(x.strip()) > 0]
+                if len(non_list_lines) > 0:
+                    validation.add_error(
+                        text=body.strip(),
+                        line_number=element.line_number(),
+                        error_message='Section does contain more than only listings.')
 
         # 4 link references
         # 4.1 check that there are only linked references
@@ -106,7 +138,7 @@ class KACLDocument:
 
     def is_valid(self):
         validation_results = self.validate()
-        return validation_results.valid()
+        return validation_results.is_valid()
 
     def add(self, section, content):
         unreleased_version = self.get('Unreleased')

@@ -89,11 +89,17 @@ class TestKacl(TestCase):
         self.assertIn(msg, version.changes('Added').items())
 
 
-    def test_validate(self):
+    def test_invalid(self):
         changlog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG_1_1_0_invalid.md")
         changelog = kacl.load(changlog_file)
+        self.assertFalse(changelog.is_valid())
+
+    def test_valid(self):
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+        changelog = kacl.load(changlog_file)
+        self.assertTrue(changelog.is_valid())
 
         validation = changelog.validate()
-
-        self.assertTrue(changelog.is_valid())
+        self.assertGreaterEqual(len(validation.errors()), 0)

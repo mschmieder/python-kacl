@@ -60,7 +60,10 @@ class KACLVersion(KACLElement):
     def sections(self):
         if not len(self.__sections) and len(self.body().strip()):
             self.__sections = dict()
-            sections = KACLParser.parse_header(self.body(), 3)
+            sections = KACLParser.parse_header(text=self.body(),
+                                               start_depth=3,
+                                               end_depth=3,
+                                               line_offset=self.line_number())
             for section in sections:
                 sec = KACLChanges(section)
                 self.__sections[sec.title()] = sec
