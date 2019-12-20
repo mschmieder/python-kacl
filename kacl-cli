@@ -17,5 +17,5 @@ def main():
 
         print(filename + ': ' + f'{error.line_number()}:0: ' + red + 'error: '  + chalk.RESET + error.error_message())
         if error.text():
-            print(error.text())
+            print(error.line())
             print(green + '^~~~~~~~~~~~~~~~~~~~' + chalk.RESET + '\n')

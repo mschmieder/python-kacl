@@ -11,4 +11,9 @@ setup(name='python-kacl',
       },
       license='MIT',
       packages=['kacl'],
+      install_requires=[
+        'click',
+        'semver',
+        'pychalk'
+      ],
       zip_safe=False)

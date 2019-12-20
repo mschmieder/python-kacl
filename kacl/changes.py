@@ -5,7 +5,9 @@ import re
 
 class KACLChanges(KACLElement):
     def __init__(self, element):
-        KACLElement.__init__(self, title=element.title(),
+        KACLElement.__init__(self, 
+                             raw=element.raw(),
+                             title=element.title(),
                              body=element.body(),
                              line_number=element.line_number())
         self.__items = []

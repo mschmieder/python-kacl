@@ -28,7 +28,7 @@ class KACLDocument:
         # 1. assume only one header and starts on first line
         if len(self.__headers) == 0:
             validation.add_error(
-                text=None,
+                line=None,
                 line_number=None,
                 error_message="No 'Changelog' header found.")
 
@@ -37,30 +37,37 @@ class KACLDocument:
         else:
             if self.header().raw() != self.header().raw().lstrip():
                 validation.add_error(
-                    text=None,
+                    line=None,
                     line_number=None,
                     error_message="Changelog header not placed on first line.")
 
         if len(self.__headers) > 1:
             for header in self.__headers[1:]:
                 validation.add_error(
-                    text=header.raw(),
+                    line=header.raw(),
                     line_number=header.line_number(),
-                    error_message="Unexpected additional top-level heading found."
+                    error_message="Unexpected additional top-level heading found.",
+                    start_character_pos=0,
+                    end_character_pos=len(header.raw())
                 )
 
         # 1.1 assume header title is in allowed list of header titles
         if self.header().title() not in self.__config.allowed_header_titles():
+            header = self.header()
+            start_pos = header.raw().find(header.title())
+            end_pos = start_pos+len(header.title())
             validation.add_error(
-                text=self.header().raw().strip(),
-                line_number=self.header().line_number(),
-                error_message=f"Header title not valid. Options are [{','.join(self.__config.allowed_header_titles())}]"
+                line=header.raw(),
+                line_number=header.line_number(),
+                error_message=f"Header title not valid. Options are [{','.join(self.__config.allowed_header_titles())}]",
+                start_character_pos=start_pos,
+                end_character_pos=end_pos
             )
 
         # 2. assume 'unreleased' version is available
         if self.get('Unreleased') == None:
             validation.add_error(
-                text=None,
+                line=None,
                 line_number=None,
                 error_message="'Unreleased' section is missing from the Changelog"
             )
@@ -71,13 +78,23 @@ class KACLDocument:
             if "Unreleased" != v.version():
                 raw = v.raw()
                 regex = KACLParser.semver_regex
+                regex_error = f'#\s+(.*)\s+'
                 if v.link():
-                    regex = f'#\s\[{KACLParser.semver_regex}\]'
+                    regex = f'#\s+\[{KACLParser.semver_regex}\]'
+                    regex_error = r'#\s+\[(.*)\]'
                 if not KACLParser.parse_sem_ver(raw, regex):
+                    start_pos
+                    end_pos
+                    m = re.match(regex_error, raw)
+                    if m:
+                        start_pos = raw.find(m.group(1))
+                        end_pos = start_pos+len(m.group(1))
                     validation.add_error(
-                        text=raw.strip(),
+                        line=raw,
                         line_number=v.line_number(),
-                        error_message=f"Version is not a valid semantic version."
+                        error_message=f"Version is not a valid semantic version.",
+                        start_character_pos=start_pos,
+                        end_character_pos=end_pos
                     )
 
         # 3.1 assume versions in descending order
@@ -87,9 +104,11 @@ class KACLDocument:
                 v1 = versions[i+1]
                 if semver.compare(v0.version(), v1.version()) < 1:
                     validation.add_error(
-                        text=v1.raw().strip(),
+                        line=v1.raw(),
                         line_number=v1.line_number(),
-                        error_message="Versions are not in descending order."
+                        error_message="Versions are not in descending order.",
+                        start_character_pos=0,
+                        end_character_pos=len(v1.raw())
                     )
             except:
                 pass
@@ -99,25 +118,35 @@ class KACLDocument:
             if "Unreleased" != v.version():
                 if not v.date() or len(v.date()) < 1:
                     validation.add_error(
-                        text=v.raw().strip(),
+                        line=v.raw(),
                         line_number=v.line_number(),
-                        error_message="Versions need to be decorated with a release date 'YYYY-MM-DD'"
+                        error_message="Versions need to be decorated with a release date 'YYYY-MM-DD'",
+                        start_character_pos=0,
+                        end_character_pos=len(v.raw())
                     )
                 if v.date() and not re.match(r'\d\d\d\d-[0-1][0-9]-[0-3][0-9]', v.date()):
+                    start_pos = v.raw().find(v.date())
+                    end_pos = start_pos+len(v.date())
                     validation.add_error(
-                        text=v.raw().strip(),
+                        line=v.raw(),
                         line_number=v.line_number(),
-                        error_message="Date does not match format 'YYYY-MM-DD'"
+                        error_message="Date does not match format 'YYYY-MM-DD'",
+                        start_character_pos=start_pos,
+                        end_character_pos=end_pos
                     )
 
         # 3.3 check that only allowed sections are in the version
             sections = v.sections()
             for title, element in sections.items():
                 if title not in self.__config.allowed_version_sections():
+                    start_pos = element.raw().find(title)
+                    end_pos = start_pos+len(title)
                     validation.add_error(
-                        text=element.raw().strip(),
+                        line=element.raw(),
                         line_number=element.line_number(),
-                        error_message=f'"{title}" is not a valid section for a version. Options are [{",".join( self.__config.allowed_version_sections())}]'
+                        error_message=f'"{title}" is not a valid section for a version. Options are [{",".join( self.__config.allowed_version_sections())}]',
+                        start_character_pos=start_pos,
+                        end_character_pos=end_pos
                     )
         # 3.4 check that only list elements are in the sections
                 # 3.4.1 bring everything into a single line
@@ -128,7 +157,7 @@ class KACLDocument:
                 ).startswith('-') and len(x.strip()) > 0]
                 if len(non_list_lines) > 0:
                     validation.add_error(
-                        text=body.strip(),
+                        line=body.strip(),
                         line_number=element.line_number(),
                         error_message='Section does contain more than only listings.'
                     )
@@ -139,9 +168,11 @@ class KACLDocument:
         for v, link in self.__link_references.items():
             if v not in version_strings:
                 validation.add_error(
-                    text=f'[{v}]: {link}',
-                    line_number=None,
-                    error_message=f"Link not referenced anywhere in the document"
+                    line=link.raw(),
+                    line_number=link.line_number(),
+                    error_message=f"Link not referenced anywhere in the document",
+                    start_character_pos=0,
+                    end_character_pos=len(link.raw())
                 )
 
         return validation
