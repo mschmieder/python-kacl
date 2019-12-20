@@ -19,17 +19,24 @@ class KACLVersion(KACLElement):
             self.__sections = dict()
         else:
             self.__sections = sections
-        self.__link_reference = link
+        self.__link_reference = None
+        self.set_link(link)
 
     def link(self):
         if self.__link_reference:
             return self.__link_reference.body()
 
     def set_link(self, link):
-        self.__link_reference = link
+        if isinstance(link, KACLElement):
+            self.__link_reference = link
+        elif link != None:
+            self.__link_reference = KACLElement(title=self.version(), body=link)
 
     def has_link_reference(self):
-        return (self.__link_reference != None)
+        if not self.__link_reference:
+            return False
+        else:
+            return (self.__link_reference.body() != None and len(self.__link_reference.body()))
 
     def date(self):
         if not len(self.__date):
@@ -77,7 +84,7 @@ class KACLVersion(KACLElement):
         return None
 
     def add(self, section, change):
-        if section not in self.__sections:
+        if section not in self.sections():
             self.__sections[section] = KACLChanges(KACLElement(
                 title=section, body="", line_number=None))
         self.__sections[section].add(change)

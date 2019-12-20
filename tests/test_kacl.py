@@ -3,6 +3,9 @@ from unittest import TestCase
 import kacl
 import os
 
+# from __future__ import print_function
+import chalk
+
 
 class TestKacl(TestCase):
     def test_load_valid(self):
@@ -90,10 +93,22 @@ class TestKacl(TestCase):
 
 
     def test_invalid(self):
+        filename='CHANGELOG_1_1_0_invalid.md'
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0_invalid.md")
+            os.path.realpath(__file__)), "data", filename)
         changelog = kacl.load(changlog_file)
         self.assertFalse(changelog.is_valid())
+
+        validation = changelog.validate()
+
+        for error in validation.errors():
+            green = chalk.Chalk('green')
+            red = chalk.Chalk('red')
+
+            print(filename + ':' + f'{error.line_number()}:0:' + red + 'error: ' + error.error_message() + chalk.RESET)
+            print('\t' + error.text())
+            print('\t' + green + '^')
+
 
     def test_valid(self):
         changlog_file = os.path.join(os.path.dirname(
@@ -102,4 +117,4 @@ class TestKacl(TestCase):
         self.assertTrue(changelog.is_valid())
 
         validation = changelog.validate()
-        self.assertGreaterEqual(len(validation.errors()), 0)
+        self.assertGreaterEqual(len(validation.errors()), 0)    

@@ -6,7 +6,9 @@ setup(name='python-kacl',
       url='http://github.com/mschmieder/python-kacl',
       author='Matthias Schmieder',
       author_email='schmieder.matthias@gmail.com',
+       entry_points = {
+        "console_scripts": ['kacl-cli = kacl.kacl_cli:start']
+      },
       license='MIT',
-      packages=['pykacl'],
-      scripts=['bin/kacl-cli'] ,
+      packages=['kacl'],
       zip_safe=False)

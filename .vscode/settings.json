@@ -1,6 +1,6 @@
 {
     "python.testing.pytestArgs": [
-        "kacl"
+        "tests"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,

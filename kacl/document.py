@@ -63,7 +63,7 @@ class KACLDocument:
         for v in versions:
             if "Unreleased" != v.version():
                 raw = v.raw()
-                regex = f'#\s\[{KACLParser.semver_regex}\]'
+                regex = KACLParser.semver_regex
                 if v.link():
                     regex = f'#\s\[{KACLParser.semver_regex}\]'
                 if not KACLParser.parse_sem_ver(raw, regex):
@@ -110,18 +110,21 @@ class KACLDocument:
                     validation.add_error(
                         text=element.raw().strip(),
                         line_number=element.line_number(),
-                        error_message=f'"{title}" not a valid section for a version. Options are [{",".join( self.__config.allowed_version_sections())}]'                    )
+                        error_message=f'"{title}" is not a valid section for a version. Options are [{",".join( self.__config.allowed_version_sections())}]'
+                    )
         # 3.4 check that only list elements are in the sections
                 # 3.4.1 bring everything into a single line
                 body = element.body()
-                body_clean = re.sub(r'\n\s+','', body)
+                body_clean = re.sub(r'\n\s+', '', body)
                 lines = body_clean.split('\n')
-                non_list_lines = [ x for x in lines if not x.strip().startswith('-') and len(x.strip()) > 0]
+                non_list_lines = [x for x in lines if not x.strip(
+                ).startswith('-') and len(x.strip()) > 0]
                 if len(non_list_lines) > 0:
                     validation.add_error(
                         text=body.strip(),
                         line_number=element.line_number(),
-                        error_message='Section does contain more than only listings.')
+                        error_message='Section does contain more than only listings.'
+                    )
 
         # 4 link references
         # 4.1 check that there are only linked references
@@ -147,15 +150,14 @@ class KACLDocument:
     def release(self, version, link=None):
         # get current unreleased changes
         unreleased_version = self.get('Unreleased')
-        unreleased_version.set_version(version)
-        unreleased_version.set_link(link)
 
         # remove current unrelease version from list
         self.__versions.pop(0)
 
         # convert unreleased version to version
         self.__versions.insert(0, KACLVersion(version=version,
-                                              link=KACLElement(title=version, body=link),
+                                              link=KACLElement(
+                                                  title=version, body=link),
                                               date=datetime.datetime.now().strftime("%Y-%m-%d"),
                                               sections=unreleased_version.sections()))
         # add new unreleased section

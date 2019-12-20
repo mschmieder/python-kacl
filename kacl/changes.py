@@ -18,4 +18,4 @@ class KACLChanges(KACLElement):
         return self.__items
 
     def add(self, item):
-        self.__items.append(item)
+        self.items().append(item)
