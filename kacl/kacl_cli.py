@@ -14,14 +14,15 @@ import click
 @click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file', show_default=True)
 @click.pass_context
 def cli(ctx, config, file):
-    changelog_file = os.path.join(os.getcwd(), file)
-    if not os.path.exists(changelog_file):
-        click.echo( click.style("Error: ", fg='red')+ f"{changelog_file} not found" )
-        sys.exit(1)
+    if ctx.invoked_subcommand != 'init':
+        changelog_file = os.path.join(os.getcwd(), file)
+        if not os.path.exists(changelog_file):
+            click.echo( click.style("Error: ", fg='red')+ f"{changelog_file} not found" )
+            sys.exit(1)
 
-    kacl_changelog = kacl.load(changelog_file)
-    ctx.obj['changelog'] = kacl_changelog
-    ctx.obj['changelog_filepath'] = changelog_file
+        kacl_changelog = kacl.load(changelog_file)
+        ctx.obj['changelog'] = kacl_changelog
+        ctx.obj['changelog_filepath'] = changelog_file
 
 @cli.command()
 @click.pass_context
@@ -63,6 +64,11 @@ def verify(ctx, json, output_file):
             click.echo(error.text())
             click.echo(green + '^~~~~~~~~~~~~~~~~~~~' + chalk.RESET)
 
+    if valid:
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
 @cli.command()
 @click.pass_context
 @click.argument('version', type=str)
@@ -81,6 +87,25 @@ def release(ctx, version, inline, link):
         f.close()
     else:
         click.echo(kacl_changelog_content)
+
+
+@cli.command()
+@click.option('-o', '--output-file', required=False, type=click.Path(exists=False), help='File to write Changelog to')
+def init(output_file):
+    kacl_default = """# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+"""
+    if output_file:
+        with open(output_file, 'w') as f:
+            f.write(kacl_default)
+        f.close()
+    else:
+        click.echo(kacl_default)
+
 
 def start():
     cli(obj={})

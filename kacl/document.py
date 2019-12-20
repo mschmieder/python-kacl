@@ -8,10 +8,9 @@ from .parser import KACLParser
 from .config import KACLConfig
 from.validation import KACLValidation
 
-
 class KACLDocument:
-    def __init__(self, content="", headers=[], versions=[], link_references=None, config=KACLConfig()):
-        self.__content = content
+    def __init__(self, data="", headers=[], versions=[], link_references=None, config=KACLConfig()):
+        self.__data = data
         self.__headers = headers
         self.__versions = versions
         self.__link_references = link_references
@@ -20,19 +19,27 @@ class KACLDocument:
         self.__config = config
 
     def validate(self):
+        """[summary]
+
+        Returns:
+            [type] -- [description]
+        """
         validation = KACLValidation()
         # 1. assume only one header and starts on first line
         if len(self.__headers) == 0:
             validation.add_error(
                 text=None,
                 line_number=None,
-                error_message="No 'Changelog' Heading found.")
+                error_message="No 'Changelog' header found.")
+
+            # we can stop here already
+            return validation
         else:
             if self.header().raw() != self.header().raw().lstrip():
                 validation.add_error(
                     text=None,
                     line_number=None,
-                    error_message="Changelog heading not placed on first line.")
+                    error_message="Changelog header not placed on first line.")
 
         if len(self.__headers) > 1:
             for header in self.__headers[1:]:
@@ -140,14 +147,32 @@ class KACLDocument:
         return validation
 
     def is_valid(self):
+        """[summary]
+        Returns:
+            [type] -- [description]
+        """
         validation_results = self.validate()
         return validation_results.is_valid()
 
-    def add(self, section, content):
+    def add(self, section, data):
+        """[summary]
+
+        Arguments:
+            section {[type]} -- [description]
+            data {[type]} -- [description]
+        """
         unreleased_version = self.get('Unreleased')
-        unreleased_version.add(section, content)
+        unreleased_version.add(section, data)
 
     def release(self, version, link=None):
+        """[summary]
+
+        Arguments:
+            version {[type]} -- [description]
+
+        Keyword Arguments:
+            link {[type]} -- [description] (default: {None})
+        """
         # get current unreleased changes
         unreleased_version = self.get('Unreleased')
 
@@ -164,31 +189,62 @@ class KACLDocument:
         self.__versions.insert(0, KACLVersion(version='Unreleased'))
 
     def get(self, version):
+        """[summary]
+
+        Arguments:
+            version {[type]} -- [description]
+
+        Returns:
+            [type] -- [description]
+        """
         res = [x for x in self.__versions if x.version()
                and version in x.version()]
         if res and len(res):
             return res[0]
 
     def header(self):
+        """[summary]
+
+        Returns:
+            [type] -- [description]
+        """
         return self.__headers[0]
 
     def title(self):
+        """[summary]
+
+        Returns:
+            [type] -- [description]
+        """
         if self.__headers[0]:
             return self.__headers[0].title()
         return None
 
     def versions(self):
+        """[summary]
+
+        Returns:
+            [type] -- [description]
+        """
         return self.__versions
 
     @staticmethod
-    def parse(text):
+    def parse(data):
+        """[summary]
+
+        Arguments:
+            data {[type]} -- [description]
+
+        Returns:
+            [type] -- [description]
+        """
         # First check if there are link references and split the document where they begin
         link_reference_begin, link_references = KACLParser.parse_link_references(
-            text)
+            data)
 
-        changelog_body = text
+        changelog_body = data
         if link_reference_begin:
-            changelog_body = text[:link_reference_begin]
+            changelog_body = data[:link_reference_begin]
 
         # read header
         headers = KACLParser.parse_header(changelog_body, 1, 2)
@@ -201,4 +257,4 @@ class KACLDocument:
         for v in versions:
             v.set_link(link_references.get(v.version(), None))
 
-        return KACLDocument(content=text, headers=headers, versions=versions, link_references=link_references)
+        return KACLDocument(data=data, headers=headers, versions=versions, link_references=link_references)
