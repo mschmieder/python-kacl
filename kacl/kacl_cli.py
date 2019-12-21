@@ -6,9 +6,8 @@ import sys
 import os
 import kacl
 import chalk
-
 import click
-
+import json
 
 @click.group()
 @click.option('-c', '--config', required=False, default='.kacl.conf', type=click.Path(exists=False), help='Path to kacl config file', show_default=True)
@@ -49,44 +48,48 @@ def add(ctx, section, message, inline):
 
 @cli.command()
 @click.pass_context
-@click.option('--json', required=False, default=False, type=bool, help='Print validation output as yaml')
+@click.option('--json', 'as_json', is_flag=True, help='Print validation output as yaml')
 @click.option('-o', '--output-file', required=False, type=click.Path(exists=False), help='Write verification output to file')
-def verify(ctx, json, output_file):
+def verify(ctx, as_json, output_file):
     kacl_changelog = ctx.obj['changelog']
     kacl_changelog_filepath = os.path.basename(ctx.obj['changelog_filepath'])
 
     valid = kacl_changelog.is_valid()
     if not valid:
-        green = chalk.Chalk('green')
-        red = chalk.Chalk('red')
-        white = chalk.Chalk('white')
-        bold = chalk.bold
-
         validation = kacl_changelog.validate()
 
-        for error in validation.errors():
-            start_char_pos, end_char_pos = error.position()
+        if as_json:
+            validation_map = validation.convert_to_dict()
+            click.echo(json.dumps(validation_map, sort_keys=True, indent=4))
+        else:
+            green = chalk.Chalk('green')
+            red = chalk.Chalk('red')
+            white = chalk.Chalk('white')
+            bold = chalk.bold
 
-            char_indicator = start_char_pos
-            if start_char_pos == None:
-                char_indicator = 0
+            for error in validation.errors():
+                start_char_pos, end_char_pos = error.position()
 
-            click.echo(bold + kacl_changelog_filepath + ':' +
-                       f'{error.line_number()}:{char_indicator}: ' +
-                       red + 'error: ' +
-                       white + error.error_message() +
-                       chalk.RESET)
+                char_indicator = start_char_pos
+                if start_char_pos == None:
+                    char_indicator = 0
 
-            if error.line():
-                click.echo(error.line())
-                if start_char_pos != None and end_char_pos != None:
-                    mark_length = end_char_pos-start_char_pos-1
-                    click.echo(' '*start_char_pos +
-                               green + '^' +
-                               '~'*(mark_length) +
-                               chalk.RESET)
+                click.echo(bold + kacl_changelog_filepath + ':' +
+                        f'{error.line_number()}:{char_indicator}: ' +
+                        red + 'error: ' +
+                        white + error.error_message() +
+                        chalk.RESET)
 
-        click.echo(f'{len(validation.errors())} error(s) generated.')
+                if error.line():
+                    click.echo(error.line())
+                    if start_char_pos != None and end_char_pos != None:
+                        mark_length = end_char_pos-start_char_pos-1
+                        click.echo(' '*start_char_pos +
+                                green + '^' +
+                                '~'*(mark_length) +
+                                chalk.RESET)
+
+            click.echo(f'{len(validation.errors())} error(s) generated.')
     if valid:
         sys.exit(0)
     else:
@@ -116,19 +119,14 @@ def release(ctx, version, inline, link):
 @cli.command()
 @click.option('-o', '--output-file', required=False, type=click.Path(exists=False), help='File to write Changelog to')
 def init(output_file):
-    kacl_default = """# Changelog
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## Unreleased
-"""
+    kacl_changelog = kacl.init()
+    kacl_changelog_content = kacl.dump(kacl_changelog)
     if output_file:
         with open(output_file, 'w') as f:
-            f.write(kacl_default)
+            f.write(kacl_changelog_content)
         f.close()
     else:
-        click.echo(kacl_default)
+        click.echo(kacl_changelog_content)
 
 
 def start():

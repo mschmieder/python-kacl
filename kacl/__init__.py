@@ -20,3 +20,6 @@ def parse(text):
 
 def dump(document):
     return KACLMarkdownSerializer().serialize(document)
+
+def init():
+    return KACLDocument.init()

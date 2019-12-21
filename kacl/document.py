@@ -120,7 +120,7 @@ class KACLDocument:
                     validation.add_error(
                         line=v.raw(),
                         line_number=v.line_number(),
-                        error_message="Versions need to be decorated with a release date 'YYYY-MM-DD'",
+                        error_message="Versions need to be decorated with a release date in the following format 'YYYY-MM-DD'",
                         start_character_pos=0,
                         end_character_pos=len(v.raw())
                     )
@@ -258,6 +258,16 @@ class KACLDocument:
             [type] -- [description]
         """
         return self.__versions
+
+    @staticmethod
+    def init():
+        return KACLDocument.parse("""# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+        """)
 
     @staticmethod
     def parse(data):

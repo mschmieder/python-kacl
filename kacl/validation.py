@@ -35,3 +35,20 @@ class KACLValidation():
                                                             start_character_pos=start_character_pos,
                                                             end_character_pos=end_character_pos,
                                                             error_message=error_message))
+
+
+    def convert_to_dict(self):
+        validation_map = dict()
+        validation_map['valid'] = (len(self.__validation_errors) == 0)
+        errors = []
+        for error in self.__validation_errors:
+            error_map = {
+                "line": error.line(),
+                "line_number": error.line_number(),
+                "start_char_pos": error.position()[0],
+                "end_character_pos": error.position()[1],
+                "error_message": error.error_message()
+            }
+            errors.append(error_map)
+        validation_map['errors'] = errors
+        return validation_map
