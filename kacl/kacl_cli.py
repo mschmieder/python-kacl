@@ -15,7 +15,7 @@ import traceback
 @click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file', show_default=True)
 @click.pass_context
 def cli(ctx, config, file):
-    if ctx.invoked_subcommand != 'init':
+    if ctx.invoked_subcommand != 'new':
         changelog_file = os.path.join(os.getcwd(), file)
         if not os.path.exists(changelog_file):
             click.echo(click.style("Error: ", fg='red') +
@@ -33,6 +33,8 @@ def cli(ctx, config, file):
 @click.argument('message', type=str)
 @click.option('--inline', is_flag=True, help='This option will add the changes directly into changelog file')
 def add(ctx, section, message, inline):
+    """Adds a given message to a specified unreleased section. Use '--inline' to directly modify the changelog file.
+    """
     kacl_changelog = ctx.obj['changelog']
     kacl_changelog_filepath = ctx.obj['changelog_filepath']
 
@@ -50,8 +52,11 @@ def add(ctx, section, message, inline):
 @cli.command()
 @click.pass_context
 @click.option('--json', 'as_json', is_flag=True, help='Print validation output as yaml')
-@click.option('-o', '--output-file', required=False, type=click.Path(exists=False), help='Write verification output to file')
-def verify(ctx, as_json, output_file):
+def verify(ctx, as_json):
+    """Veryfies if the changelog is in "keep-a-changlog" format.
+    Use '--json' get JSON formatted output that can be easier integrated into CI workflows.
+    Exit code is the number of identified errors.
+    """
     kacl_changelog = ctx.obj['changelog']
     kacl_changelog_filepath = os.path.basename(ctx.obj['changelog_filepath'])
 
@@ -102,6 +107,8 @@ def verify(ctx, as_json, output_file):
 @click.option('--inline', is_flag=True, help='This option will add the changes directly into changelog file')
 @click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with', show_default=True)
 def release(ctx, version, inline, link):
+    """Creates a release for the latest 'unreleased' changes. Use '--inline' to directly modify the changelog file.
+    """
     kacl_changelog = ctx.obj['changelog']
     kacl_changelog_filepath = ctx.obj['changelog_filepath']
 
@@ -117,9 +124,11 @@ def release(ctx, version, inline, link):
 
 
 @cli.command()
-@click.option('-o', '--output-file', required=False, type=click.Path(exists=False), help='File to write Changelog to')
-def init(output_file):
-    kacl_changelog = kacl.init()
+@click.option('-o', '--output-file', required=False, type=click.Path(exists=False), help='File to write the created changelog to.')
+def new(output_file):
+    """Creates a new changlog.
+    """
+    kacl_changelog = kacl.new()
     kacl_changelog_content = kacl.dump(kacl_changelog)
     if output_file:
         with open(output_file, 'w') as f:
