@@ -1,6 +1,6 @@
 # python-kacl
 
-A tool for verifying and modifying changelog in the [**K**-eep-**A-C**hange-**L**og](https://keepachangelog.com/en/1.0.0/) format.
+A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**og](https://keepachangelog.com/en/1.0.0/) format.
 
 ## Status
 
