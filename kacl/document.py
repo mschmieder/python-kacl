@@ -19,10 +19,10 @@ class KACLDocument:
         self.__config = config
 
     def validate(self):
-        """[summary]
+        """Validates the current changelog and returns KACLValidation object containing all information
 
         Returns:
-            [type] -- [description]
+            [KACLValidation] -- object holding all error information
         """
         validation = KACLValidation()
         # 1. assume only one header and starts on first line
@@ -64,13 +64,13 @@ class KACLDocument:
                 end_character_pos=end_pos
             )
 
-        # 2. assume 'unreleased' version is available
-        if self.get('Unreleased') == None:
-            validation.add_error(
-                line=None,
-                line_number=None,
-                error_message="'Unreleased' section is missing from the Changelog"
-            )
+        # # 2. assume 'unreleased' version is available
+        # if self.get('Unreleased') == None:
+        #     validation.add_error(
+        #         line=None,
+        #         line_number=None,
+        #         error_message="'Unreleased' section is missing from the Changelog"
+        #     )
 
         # 3. assume versions in valid format
         versions = self.versions()
@@ -178,31 +178,35 @@ class KACLDocument:
         return validation
 
     def is_valid(self):
-        """[summary]
+        """Checks if the current changelog is valid
         Returns:
-            [type] -- [description]
+            [bool] -- true if valid false if not
         """
         validation_results = self.validate()
         return validation_results.is_valid()
 
     def add(self, section, data):
-        """[summary]
+        """adds a new change to a given section in the 'unreleased' version
 
         Arguments:
-            section {[type]} -- [description]
-            data {[type]} -- [description]
+            section {[str]} -- section to add data to
+            data {[str]} -- change information
         """
         unreleased_version = self.get('Unreleased')
+        if unreleased_version == None:
+            unreleased_version = KACLVersion(version="Unreleased")
+            self.__versions.insert(0, unreleased_version)
         unreleased_version.add(section, data)
 
     def release(self, version, link=None):
-        """[summary]
+        """Creates a new release version by copying the 'unreleased' changes into the 
+        new version
 
         Arguments:
-            version {[type]} -- [description]
+            version {[str]} -- semantic versioning string
 
         Keyword Arguments:
-            link {[type]} -- [description] (default: {None})
+            link {[str]} -- url the version will be linked with (default: {None})
         """
         # get current unreleased changes
         unreleased_version = self.get('Unreleased')
@@ -216,17 +220,15 @@ class KACLDocument:
                                                   title=version, body=link),
                                               date=datetime.datetime.now().strftime("%Y-%m-%d"),
                                               sections=unreleased_version.sections()))
-        # add new unreleased section
-        self.__versions.insert(0, KACLVersion(version='Unreleased'))
 
     def get(self, version):
-        """[summary]
+        """Returns the selected version
 
         Arguments:
-            version {[type]} -- [description]
+            version {[str]} -- semantic versioning string
 
         Returns:
-            [type] -- [description]
+            [KACLVersion] -- version object with all information
         """
         res = [x for x in self.__versions if x.version()
                and version in x.version()]
@@ -234,28 +236,28 @@ class KACLDocument:
             return res[0]
 
     def header(self):
-        """[summary]
+        """Gives access to the top level heading element
 
         Returns:
-            [type] -- [description]
+            [KACLElement] -- object holding all information of the top level heading
         """
         return self.__headers[0]
 
     def title(self):
-        """[summary]
+        """Returns the title of the changelog
 
         Returns:
-            [type] -- [description]
+            [str] -- title of the changelog
         """
         if self.__headers[0]:
             return self.__headers[0].title()
         return None
 
     def versions(self):
-        """[summary]
+        """Returns a list of all available versions
 
         Returns:
-            [type] -- [description]
+            [list] -- list of KACLVersions
         """
         return self.__versions
 
@@ -271,13 +273,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
     @staticmethod
     def parse(data):
-        """[summary]
+        """Parses a given text object and returns the KACLDocument
 
         Arguments:
-            data {[type]} -- [description]
+            data {[str]} -- markdown text holding the changelog
 
         Returns:
-            [type] -- [description]
+            [KACLDocument] -- object holding all information
         """
         # First check if there are link references and split the document where they begin
         link_reference_begin, link_references = KACLParser.parse_link_references(
