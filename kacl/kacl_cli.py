@@ -166,7 +166,6 @@ def new(output_file):
     else:
         click.echo(kacl_changelog_content)
 
-
 def start():
     try:
         cli(obj={})
