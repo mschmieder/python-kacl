@@ -61,41 +61,41 @@ def verify(ctx, as_json):
     kacl_changelog_filepath = os.path.basename(ctx.obj['changelog_filepath'])
 
     valid = kacl_changelog.is_valid()
-    if not valid:
-        validation = kacl_changelog.validate()
+    validation = kacl_changelog.validate()
+    if as_json:
+        validation_map = validation.convert_to_dict()
+        click.echo(json.dumps(validation_map, sort_keys=True, indent=4))
+    else:
+        green = chalk.Chalk('green')
+        red = chalk.Chalk('red')
+        white = chalk.Chalk('white')
+        bold = chalk.bold
 
-        if as_json:
-            validation_map = validation.convert_to_dict()
-            click.echo(json.dumps(validation_map, sort_keys=True, indent=4))
-        else:
-            green = chalk.Chalk('green')
-            red = chalk.Chalk('red')
-            white = chalk.Chalk('white')
-            bold = chalk.bold
+        for error in validation.errors():
+            start_char_pos, end_char_pos = error.position()
 
-            for error in validation.errors():
-                start_char_pos, end_char_pos = error.position()
+            char_indicator = start_char_pos
+            if start_char_pos == None:
+                char_indicator = 0
 
-                char_indicator = start_char_pos
-                if start_char_pos == None:
-                    char_indicator = 0
+            click.echo(bold + kacl_changelog_filepath + ':' +
+                    f'{error.line_number()}:{char_indicator}: ' +
+                    red + 'error: ' +
+                    white + error.error_message() +
+                    chalk.RESET)
 
-                click.echo(bold + kacl_changelog_filepath + ':' +
-                        f'{error.line_number()}:{char_indicator}: ' +
-                        red + 'error: ' +
-                        white + error.error_message() +
-                        chalk.RESET)
-
-                if error.line():
-                    click.echo(error.line())
-                    if start_char_pos != None and end_char_pos != None:
-                        mark_length = end_char_pos-start_char_pos-1
-                        click.echo(' '*start_char_pos +
-                                green + '^' +
-                                '~'*(mark_length) +
-                                chalk.RESET)
-
+            if error.line():
+                click.echo(error.line())
+                if start_char_pos != None and end_char_pos != None:
+                    mark_length = end_char_pos-start_char_pos-1
+                    click.echo(' '*start_char_pos +
+                            green + '^' +
+                            '~'*(mark_length) +
+                            chalk.RESET)
+        if not valid:
             click.echo(f'{len(validation.errors())} error(s) generated.')
+        else:
+            click.secho('Success. Changlog is valid', fg='green')
 
     if not valid:
         sys.exit(len(validation.errors()))

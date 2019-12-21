@@ -23,5 +23,5 @@ class KACLConfig:
     def allowed_version_sections(self):
         return self.__allowed_version_sections
 
-    def default_content():
+    def default_content(self):
         return self.__default_content
