@@ -11,8 +11,8 @@ class KACLParser:
             end_depth = start_depth
 
         elements = []
-        reg_expr_start = r'(\n{depth}|^{depth})\s+(.*)\n'.format(depth="#"*start_depth)
-        reg_expr_end = r'(\n{depth}|^{depth})\s+(.*)\n'.format(depth="#"*end_depth)
+        reg_expr_start = r'(\n{depth}|^{depth})\s+?(.*)\n'.format(depth="#"*start_depth)
+        reg_expr_end = r'(\n{depth}|^{depth})\s+?(.*)\n'.format(depth="#"*end_depth)
         for match in re.finditer(reg_expr_start, text):
             # find end of section
             raw = match.group().strip()

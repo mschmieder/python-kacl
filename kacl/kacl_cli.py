@@ -8,6 +8,7 @@ import kacl
 import chalk
 import click
 import json
+import traceback
 
 @click.group()
 @click.option('-c', '--config', required=False, default='.kacl.conf', type=click.Path(exists=False), help='Path to kacl config file', show_default=True)
@@ -90,10 +91,9 @@ def verify(ctx, as_json, output_file):
                                 chalk.RESET)
 
             click.echo(f'{len(validation.errors())} error(s) generated.')
-    if valid:
-        sys.exit(0)
-    else:
-        sys.exit(1)
+
+    if not valid:
+        sys.exit(len(validation.errors()))
 
 
 @cli.command()
@@ -130,8 +130,14 @@ def init(output_file):
 
 
 def start():
-    cli(obj={})
-
+    try:
+        cli(obj={})
+    except SystemExit as e:
+        sys.exit(e.code)
+    except:
+        click.secho('Unexpected error occured. Make sure your file is a valid Mardown file.', fg='red')
+        click.echo(traceback.format_exc())
+        sys.exit(1)
 
 if __name__ == '__main__':
     start()
