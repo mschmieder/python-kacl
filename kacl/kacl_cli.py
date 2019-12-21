@@ -8,11 +8,12 @@ import kacl
 import chalk
 import click
 import json
+import semver
 import traceback
 
 @click.group()
-@click.option('-c', '--config', required=False, default='.kacl.conf', type=click.Path(exists=False), help='Path to kacl config file', show_default=True)
-@click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file', show_default=True)
+@click.option('-c', '--config', required=False, default='.kacl.conf', type=click.Path(exists=False), help='Path to kacl config file.', show_default=True)
+@click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file.', show_default=True)
 @click.pass_context
 def cli(ctx, config, file):
     if ctx.invoked_subcommand != 'new':
@@ -31,17 +32,17 @@ def cli(ctx, config, file):
 @click.pass_context
 @click.argument('section', type=str)
 @click.argument('message', type=str)
-@click.option('--inline', is_flag=True, help='This option will add the changes directly into changelog file')
-def add(ctx, section, message, inline):
-    """Adds a given message to a specified unreleased section. Use '--inline' to directly modify the changelog file.
+@click.option('-m', '--modify', is_flag=True, help='This option will add the changes directly into changelog file.')
+def add(ctx, section, message, modify):
+    """Adds a given message to a specified unreleased section. Use '--modify' to directly modify the changelog file.
     """
     kacl_changelog = ctx.obj['changelog']
     kacl_changelog_filepath = ctx.obj['changelog_filepath']
 
     # add changes to changelog
-    kacl_changelog.add(section=section, content=message)
+    kacl_changelog.add(section=section, data=message)
     kacl_changelog_content = kacl.dump(kacl_changelog)
-    if inline:
+    if modify:
         with open(kacl_changelog_filepath, 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
@@ -51,7 +52,27 @@ def add(ctx, section, message, inline):
 
 @cli.command()
 @click.pass_context
-@click.option('--json', 'as_json', is_flag=True, help='Print validation output as yaml')
+@click.argument('version', type=str)
+def get(ctx, version):
+    """Returns a given version from the Changelog.
+    """
+    kacl_changelog = ctx.obj['changelog']
+    kacl_changelog_filepath = ctx.obj['changelog_filepath']
+
+    # add changes to changelog
+    kacl_version = kacl_changelog.get(version)
+
+    if kacl_version:
+        kacl_changelog_content = kacl.dump(kacl_version)
+        click.echo(kacl_changelog_content)
+    else:
+        click.echo(click.style("Error: ", fg='red') + f'"{version}" could not be found in changelog.')
+        sys.exit(1)
+
+
+@cli.command()
+@click.pass_context
+@click.option('--json', 'as_json', is_flag=True, help='Print validation output as yaml.')
 def verify(ctx, as_json):
     """Veryfies if the changelog is in "keep-a-changlog" format.
     Use '--json' get JSON formatted output that can be easier integrated into CI workflows.
@@ -95,7 +116,7 @@ def verify(ctx, as_json):
         if not valid:
             click.echo(f'{len(validation.errors())} error(s) generated.')
         else:
-            click.secho('Success. Changlog is valid', fg='green')
+            click.secho('Success', fg='green')
 
     if not valid:
         sys.exit(len(validation.errors()))
@@ -104,18 +125,26 @@ def verify(ctx, as_json):
 @cli.command()
 @click.pass_context
 @click.argument('version', type=str)
-@click.option('--inline', is_flag=True, help='This option will add the changes directly into changelog file')
-@click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with', show_default=True)
-def release(ctx, version, inline, link):
-    """Creates a release for the latest 'unreleased' changes. Use '--inline' to directly modify the changelog file.
+@click.option('-m', '--modify', is_flag=True, help='This option will add the changes directly into changelog file.')
+@click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with.', show_default=True)
+def release(ctx, version, modify, link):
+    """Creates a release for the latest 'unreleased' changes. Use '--modify' to directly modify the changelog file.
     """
     kacl_changelog = ctx.obj['changelog']
     kacl_changelog_filepath = ctx.obj['changelog_filepath']
 
+    # check if version is a valid semantic version
+    try:
+        semver.parse(version)
+    except:
+        click.echo(click.style("Error: ", fg='red') +
+                   f'"{version}" not a valid semantic version.')
+        sys.exit(1)
+
     # release changes
     kacl_changelog.release(version=version, link=link)
     kacl_changelog_content = kacl.dump(kacl_changelog)
-    if inline:
+    if modify:
         with open(kacl_changelog_filepath, 'w') as f:
             f.write(kacl_changelog_content)
         f.close()

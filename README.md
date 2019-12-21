@@ -57,11 +57,26 @@ docker -v $(pwd):$(pwd) -w $(pwd) mschmieder/kacl-cli:latest verify
 
 ## CLI
 
+```
+Usage: kacl-cli [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -c, --config PATH  Path to kacl config file  [default: .kacl.conf]
+  -f, --file PATH    Path to changelog file  [default: CHANGELOG.md]
+  --help             Show this message and exit.
+
+Commands:
+  add      Adds a given message to a specified unreleased section.
+  get      Returns a given version from the Changelog
+  new      Creates a new changlog.
+  release  Creates a release for the latest 'unreleased' changes.
+  verify   Veryfies if the changelog is in "keep-a-changlog" format.
+```
 
 
 ## Create a Changelog
 
-```verbatim
+```
 Usage: kacl-cli new [OPTIONS]
 
   Creates a new changlog.
@@ -70,6 +85,8 @@ Options:
   -o, --output-file PATH  File to write the created changelog to.
   --help                  Show this message and exit.
 ```
+
+**Usage**
 
 ```bash
 kacl-cli new
@@ -88,7 +105,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Verify a Changelog
 
-```verbatim
+```
 Usage: kacl-cli verify [OPTIONS]
 
   Veryfies if the changelog is in "keep-a-changlog" format. Use '--json' get
@@ -99,6 +116,8 @@ Options:
   --json  Print validation output as yaml
   --help  Show this message and exit.
 ```
+
+**Usage**
 
 ```bash
 kacl-cli verify
@@ -134,9 +153,12 @@ kacl-cli verify --json
 
 ## Print a single release changelog
 
+**Usage**
+
 ```bash
 kacl-cli get 0.2.2
 ```
+
 ```markdown
 ## [0.2.2] - 2018-01-16
 
@@ -147,13 +169,41 @@ kacl-cli get 0.2.2
 
 ## Add an entry to an unreleased section
 
+```
+Usage: kacl-cli add [OPTIONS] SECTION MESSAGE
+
+  Adds a given message to a specified unreleased section. Use '--modify' to
+  directly modify the changelog file.
+
+Options:
+  -m, --modify  This option will add the changes directly into changelog file
+  --help        Show this message and exit.
+```
+
+**Usage**
+
 ```bash
-kacl-cli add fixed 'We fixed some bad issues' -e
-kacl-cli add added 'We just added some new cool stuff' -e
-kacl-cli add changed 'And changed things a bit' -e
+kacl-cli add fixed 'We fixed some bad issues' --modify
+kacl-cli add added 'We just added some new cool stuff' --modify
+kacl-cli add changed 'And changed things a bit' --modify
 ```
 
 ## Prepare a Changelog for a Release
+
+```
+Usage: kacl-cli release [OPTIONS] VERSION
+
+  Creates a release for the latest 'unreleased' changes. Use '--modify' to
+  directly modify the changelog file.
+
+Options:
+  -m, --modify     This option will add the changes directly into changelog
+                   file
+  -l, --link TEXT  A url that the version will be linked with
+  --help           Show this message and exit.
+```
+
+**Usage**
 
 ```bash
 kacl-cli release 0.13.1

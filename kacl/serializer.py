@@ -8,18 +8,19 @@ class KACLMarkdownSerializer:
         pass
 
     def serialize(self, document):
-        data = [ self.__serialize_header(document.header()),
-                 document.header().body() ]
+        if isinstance(document, KACLDocument):
+            data = [ self.__serialize_header(document.header()),
+                    document.header().body() ]
 
-        link_references = []
-        for version in document.versions():
-            data.extend([ self.__serialize_version(version), '' ])
-            if version.has_link_reference():
-                link_references.append(self.__serialize_link_reference(version))
+            link_references = []
+            for version in document.versions():
+                data.extend([ self.__serialize_version(version), '' ])
+                if version.has_link_reference():
+                    link_references.append(self.__serialize_link_reference(version))
 
-        data.extend(link_references)
-
-        return '\n'.join(data)
+            return '\n'.join(data)
+        elif isinstance(document, KACLVersion):
+            return self.__serialize_version(document)
 
     def __serialize_header(self, obj):
         if isinstance(obj, KACLChanges):

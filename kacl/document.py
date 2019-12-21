@@ -196,7 +196,7 @@ class KACLDocument:
         if unreleased_version == None:
             unreleased_version = KACLVersion(version="Unreleased")
             self.__versions.insert(0, unreleased_version)
-        unreleased_version.add(section, data)
+        unreleased_version.add(section.capitalize(), data)
 
     def release(self, version, link=None):
         """Creates a new release version by copying the 'unreleased' changes into the 
@@ -231,7 +231,7 @@ class KACLDocument:
             [KACLVersion] -- version object with all information
         """
         res = [x for x in self.__versions if x.version()
-               and version in x.version()]
+               and version.capitalize() == x.version()]
         if res and len(res):
             return res[0]
 
