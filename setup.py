@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='python-kacl',
-      version='0.1',
+      version='0.1.0',
       description='Pyhton module and CLI tool for validating and modifying Changelogs in "keep-a-changelog" format"',
       long_description=long_description,
       long_description_content_type='text/markdown',
