@@ -1,4 +1,8 @@
 language: python
+env:
+  global:
+  - secure: UMfs6l0LOwNXURIXONRnT012TH7qcyedXpAhBvCyPudtMtrr48lqzOG1P553nASQhpIoHiN/QKDtNs9nvj5wmZ9QlfwYyhx/wsTDcQFyecZ8FUnal/N1YABatvSF97rcZA25y+84QPp1nFjujGgzSrrMu+B3dipa7Bge//fPACsnNuw8q2B2nuRdfSsJtTv3t4yfaJpHHzdLD4dfJk9Mj/Cx+32u4zNxgpRZfRqnfMD7LbezUukm2ilGBcbwfjNhQ1o9W7roiYDJy+QJvq/LnRhofsH0XCsTSZBIwPJl3Ypvk+Ea9vZuyqWmVaTxS1NFkyVDle6v9moih5Tsztz3mm/h0L33Q2eJ+ZL/WQMbkdRh+1mVfSvuXbPWDX5lkpNQtm2VplA8P9EX+EhF8tPqu6TusIIPs1gnENg0Z3+sNLlvL8oauEfdBdXZ4A6UIm2hVGk9w5FQ9FWjh4k+Nc89bPoUqHw3UDjT+5cvaY9OuySA0Yl8Po9Emng84MYaad0dikmvijvN1HB01SAei5383Pgm95CqmpgDLsF7UXk1i7YYkqBSDfZx25TfBMZcf8jEYN8qNnJ6fzZ7j0mxut0LzQ+pa6MnCyR4a8poIdXBrOjL0MYE3vlQSBO/F4Rt7CZCUYWh0MWpl8Tx/PQvqlqDHmq5jNRW3kAgD+U15Duo6OA=
+  - secure: ZFja6SrJQB1KAsQWoahPUbWA/IbeRSkOHhZGxv82JUsW81Mr6XUKrUqNLUxSZvvhguD4y0b5e8On/BTqB+829S0CteLGVpbLI6oj0sr+y9o9pskAxoun8XMY3hUzg4RmL/WwU9W78vSpLMRlWS60NwT+nI6QcIvP2uRG5L0jeK8kwnWhB+Ns7z5/CtdGHiE16NvETsE3NHihKXUDhiK+83RT+qfjpQvVCy/wioqe/Ixl2NKJzHhExARNIG7/aViK1e5bQHXo+vUlR7xlrQamFp7z8ZQlrwhWNAP8WCqJrbUHC+8ai1Gsm4Ia62DLsI2RhpMvFd2fR0+1aKySoMV8gVcwFZ0oVQ+9/arC+TII813OnfhBKd/5MpMluCUL2UC1zAOP8shwLDOWVIr8eRzjb/js9eMaz0CqJreoTC81kkBvC5/bM0+JBV6ey4x3tgV9zXR3KfoDU5BYWpyqciTYp+qNk7fmzgGXeuwRFVncj+xxYjuohEZiycJJozpcKuBCjBrWRnb3SD+CyqfckikUFcIMnalqo26xi4SSmYElvHJYtIwHios8K37GEJXybnt94J+V4aircrT3pMmGFTXp+Tpf9+SGbyiGHGd72lSVa31w8FEDWewtt8O3bNCJIbn2GYVxzpAEvrMABrdaQukn8Nm7M0B1W0wS5CV/n6OuZwA=
 python:
 - 3.6
 - 3.7
@@ -7,20 +11,16 @@ install:
 - pip install .
 - pip install nose2
 script: nose2 -v
-
-jobs:
-  include:
-  - stage: docker
-    services:
-    - docker
-    script: docker pull hello-world
-  - stage: deploy
-    deploy:
-      provider: pypi
-      user: __token__
-      server: https://test.pypi.org/legacy/
-      password:
-        secure: YiLcNwEoWAZZFu7Sxfaf9RStHewkTE8dyF85yrVCGvXqDzgVK6yVmH3WT5n3xxdRn1UliLO1FzxmMFKBx6AeFOSwNCtbKE3BknoPJlCegp1ZKs3lzaqw04CDbNdG1bBGJY3cs8XiZULxMEfDQxBNh6YCWwKDRW/5Or3zelxL4PzHmlezKH8AQNSxItoMpG1wAWWvMiNG38hAPr8I8skVG0s8fZ+8wZmsYEH0fMHKRhlLEBvmLqZdXFb3/SFR88bW8ROHWbT692PhpkOaFqei3V1Oy3lDf9VICWYV0UvPFqyyBFpEUTxCZVPaAwW/Vk0VWr8gAFDsLBnO9DRe2XIIG6Dp+3HbztBBCy1m6nNtMHRCH7DhQOaY6almHQd/XJ2fvSEN4e0iL7jxBIU23Eu7uIa/KaZ7ASZOp22xoHtXO49R1eJexTJSIEdqR20iq8V8CEmuLWICagQwsdkNHVDQP4pUF3c8AVVqi2IPNH0A9/l56RumgQHvUnf0JsR/44IGfXWoi6QQsAvk0U5t3txpK53+QJPAsvVTtX4oHELa3JpyRY+7DDrtzpnqDG8IIZK7tw/RdvtjMInuyMyXOiS28TTVnUKp4KXuJMuKSBAhn5ddQXNrBEytGTp4PK74Lo+9WPEMcGNzR6WcGCd7sL67I3yZawIvxpoi1OOzqiQCPFs=
-      skip_existing: true
-      on:
-        branch: travis-ci
+deploy:
+- provider: pypi
+  user: __token__
+  server: https://test.pypi.org/legacy/
+  password:
+    secure: YiLcNwEoWAZZFu7Sxfaf9RStHewkTE8dyF85yrVCGvXqDzgVK6yVmH3WT5n3xxdRn1UliLO1FzxmMFKBx6AeFOSwNCtbKE3BknoPJlCegp1ZKs3lzaqw04CDbNdG1bBGJY3cs8XiZULxMEfDQxBNh6YCWwKDRW/5Or3zelxL4PzHmlezKH8AQNSxItoMpG1wAWWvMiNG38hAPr8I8skVG0s8fZ+8wZmsYEH0fMHKRhlLEBvmLqZdXFb3/SFR88bW8ROHWbT692PhpkOaFqei3V1Oy3lDf9VICWYV0UvPFqyyBFpEUTxCZVPaAwW/Vk0VWr8gAFDsLBnO9DRe2XIIG6Dp+3HbztBBCy1m6nNtMHRCH7DhQOaY6almHQd/XJ2fvSEN4e0iL7jxBIU23Eu7uIa/KaZ7ASZOp22xoHtXO49R1eJexTJSIEdqR20iq8V8CEmuLWICagQwsdkNHVDQP4pUF3c8AVVqi2IPNH0A9/l56RumgQHvUnf0JsR/44IGfXWoi6QQsAvk0U5t3txpK53+QJPAsvVTtX4oHELa3JpyRY+7DDrtzpnqDG8IIZK7tw/RdvtjMInuyMyXOiS28TTVnUKp4KXuJMuKSBAhn5ddQXNrBEytGTp4PK74Lo+9WPEMcGNzR6WcGCd7sL67I3yZawIvxpoi1OOzqiQCPFs=
+  skip_existing: true
+  on:
+    branch: travis-ci
+- provider: script
+  script: bash scripts/deploy-docker.sh
+  on:
+    branch: travis-ci
