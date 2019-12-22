@@ -9,10 +9,10 @@ install:
 script: nose2 -v
 deploy:
   provider: pypi
-  skip_cleanup: true
   user: __token__
   server: https://testpypi.python.org/pypi
   password:
     secure: YiLcNwEoWAZZFu7Sxfaf9RStHewkTE8dyF85yrVCGvXqDzgVK6yVmH3WT5n3xxdRn1UliLO1FzxmMFKBx6AeFOSwNCtbKE3BknoPJlCegp1ZKs3lzaqw04CDbNdG1bBGJY3cs8XiZULxMEfDQxBNh6YCWwKDRW/5Or3zelxL4PzHmlezKH8AQNSxItoMpG1wAWWvMiNG38hAPr8I8skVG0s8fZ+8wZmsYEH0fMHKRhlLEBvmLqZdXFb3/SFR88bW8ROHWbT692PhpkOaFqei3V1Oy3lDf9VICWYV0UvPFqyyBFpEUTxCZVPaAwW/Vk0VWr8gAFDsLBnO9DRe2XIIG6Dp+3HbztBBCy1m6nNtMHRCH7DhQOaY6almHQd/XJ2fvSEN4e0iL7jxBIU23Eu7uIa/KaZ7ASZOp22xoHtXO49R1eJexTJSIEdqR20iq8V8CEmuLWICagQwsdkNHVDQP4pUF3c8AVVqi2IPNH0A9/l56RumgQHvUnf0JsR/44IGfXWoi6QQsAvk0U5t3txpK53+QJPAsvVTtX4oHELa3JpyRY+7DDrtzpnqDG8IIZK7tw/RdvtjMInuyMyXOiS28TTVnUKp4KXuJMuKSBAhn5ddQXNrBEytGTp4PK74Lo+9WPEMcGNzR6WcGCd7sL67I3yZawIvxpoi1OOzqiQCPFs=
+  skip_existing: true
   on:
     branch: travis-ci
