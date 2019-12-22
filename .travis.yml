@@ -17,7 +17,7 @@ jobs:
     - stage: docker
       services:
       - docker
-      script: docker build mschmieder/kacl-cli .
+      script: docker build -t mschmieder/kacl-cli .
     - stage: deploy
       deploy:
       - provider: pypi
