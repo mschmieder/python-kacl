@@ -18,6 +18,7 @@ class KACLMarkdownSerializer:
                 if version.has_link_reference():
                     link_references.append(self.__serialize_link_reference(version))
 
+            data.extend(link_references)
             return '\n'.join(data)
         elif isinstance(document, KACLVersion):
             return self.__serialize_version(document)
