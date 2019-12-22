@@ -24,9 +24,15 @@ setup(name='python-kacl',
       },
       license='MIT',
       packages=['kacl'],
+      python_requires='>=3.6',
       install_requires=[
           'click',
           'semver',
           'pychalk'
       ],
-      zip_safe=False)
+      zip_safe=False,
+      classifiers= [
+          "License :: OSI Approved :: MIT License",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.6"
+      ])
