@@ -11,11 +11,14 @@ import json
 import semver
 import traceback
 
-@click.group()
+@click.group(invoke_without_command=True)
+@click.option('-v', '--version', is_flag=True, required=False, help='Prints the current version of the CLI.')
 @click.option('-c', '--config', required=False, default='.kacl.conf', type=click.Path(exists=False), help='Path to kacl config file.', show_default=True)
 @click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file.', show_default=True)
 @click.pass_context
-def cli(ctx, config, file):
+def cli(ctx, version, config, file):
+    if version:
+        click.echo(kacl.__version__)
     if ctx.invoked_subcommand != 'new':
         changelog_file = os.path.join(os.getcwd(), file)
         if not os.path.exists(changelog_file):
