@@ -25,7 +25,7 @@ class KACLDocument:
             [KACLValidation] -- object holding all error information
         """
         validation = KACLValidation()
-        # 1. assume only one header and starts on first line
+        # 1. assert only one header and starts on first line
         if len(self.__headers) == 0:
             validation.add_error(
                 line=None,
@@ -51,7 +51,7 @@ class KACLDocument:
                     end_character_pos=len(header.raw())
                 )
 
-        # 1.1 assume header title is in allowed list of header titles
+        # 1.1 assert header title is in allowed list of header titles
         if self.header().title() not in self.__config.allowed_header_titles():
             header = self.header()
             start_pos = header.raw().find(header.title())
@@ -64,7 +64,21 @@ class KACLDocument:
                 end_character_pos=end_pos
             )
 
-        # # 2. assume 'unreleased' version is available
+        # 1.2 assert default content is in the header section
+        for default_line in self.__config.default_content():
+            if default_line not in self.header().body():
+                header = self.header()
+                start_pos = header.raw().find(header.title())
+                end_pos = start_pos+len(header.title())
+                validation.add_error(
+                    line=header.raw(),
+                    line_number=header.line_number(),
+                    error_message=f"Missing default content '{default_line}'",
+                    start_character_pos=start_pos,
+                    end_character_pos=end_pos
+                )
+
+        # # 2. assert 'unreleased' version is available
         # if self.get('Unreleased') == None:
         #     validation.add_error(
         #         line=None,
@@ -72,7 +86,7 @@ class KACLDocument:
         #         error_message="'Unreleased' section is missing from the Changelog"
         #     )
 
-        # 3. assume versions in valid format
+        # 3. assert versions in valid format
         versions = self.versions()
         for v in versions:
             if "Unreleased" != v.version():
@@ -97,7 +111,7 @@ class KACLDocument:
                         end_character_pos=end_pos
                     )
 
-        # 3.1 assume versions in descending order
+        # 3.1 assert versions in descending order
         for i in range(len(versions)-1):
             try:
                 v0 = versions[i]
@@ -113,7 +127,7 @@ class KACLDocument:
             except:
                 pass
 
-        # 3.2 assume versions have a valid date
+        # 3.2 assert versions have a valid date
         for v in versions:
             if "Unreleased" != v.version():
                 if not v.date() or len(v.date()) < 1:
@@ -214,8 +228,10 @@ class KACLDocument:
         # remove current unrelease version from list
         self.__versions.pop(0)
 
+        self.__versions.insert(0, KACLVersion(version="Unreleased", link=unreleased_version.link()))
+
         # convert unreleased version to version
-        self.__versions.insert(0, KACLVersion(version=version,
+        self.__versions.insert(1, KACLVersion(version=version,
                                               link=KACLElement(
                                                   title=version, body=link),
                                               date=datetime.datetime.now().strftime("%Y-%m-%d"),
