@@ -1,24 +1,16 @@
 language: python
 python:
-  - "3.6"      # current default Python on Travis CI
-  - "3.7"
-  - "3.8"
+  - 3.6      # current default Python on Travis CI
+  - 3.7
+  - 3.8
 
-stages:
-  - test
-  - name: deploy
-    #if: branch = master
+install:
+  - pip install .
+  - pip install nose2  
+script: nose2 -v
 
 jobs:
   include:
-    - stage: test
-      # command to install dependencies
-      install:
-        - pip install .
-        - pip install nose2
-      # command to run tests
-      script:
-        - nose2 -v
     - stage: deploy
-      python: "3.6"
+      python: 3.6
       script: echo "Deploy Stage" && python --version
