@@ -4,13 +4,14 @@ python:
   - 3.7
   - 3.8
 
-install:
-  - pip install .
-  - pip install nose2  
-script: nose2 -v
-
 jobs:
   include:
+    - script: nose2 -v
+      install:
+      - pip install .
+      - pip install nose2
     - stage: deploy
       python: 3.6
-      script: echo "Deploy Stage" && python --version
+      script:
+        - python setup.py dist
+        - twine
