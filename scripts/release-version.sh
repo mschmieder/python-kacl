@@ -15,4 +15,4 @@ python3 kacl/kacl_cli.py release $(cat VERSION) --modify
 git add CHANGELOG.md kacl/__init__.py VERSION .bumpversion.cfg
 git commit -m "Version update ${current_version} --> ${new_version}"
 git tag v${new_version}
-git push master --tags
+git push origin --tags
