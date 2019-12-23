@@ -17,8 +17,11 @@ import traceback
 @click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file.', show_default=True)
 @click.pass_context
 def cli(ctx, version, config, file):
+    # if --version was given, print version and exit directly
     if version:
         click.echo(kacl.__version__)
+        sys.exit(0)
+
     if ctx.invoked_subcommand != 'new':
         changelog_file = os.path.join(os.getcwd(), file)
         if not os.path.exists(changelog_file):
