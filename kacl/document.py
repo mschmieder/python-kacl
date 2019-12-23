@@ -92,9 +92,9 @@ class KACLDocument:
             if "Unreleased" != v.version():
                 raw = v.raw()
                 regex = KACLParser.semver_regex
-                regex_error = f'#\s+(.*)\s+'
+                regex_error = r'#\s+(.*)\s+'
                 if v.link():
-                    regex = f'#\s+\[{KACLParser.semver_regex}\]'
+                    regex = f'#\\s+\\[{KACLParser.semver_regex}\\]'
                     regex_error = r'#\s+\[(.*)\]'
                 if not KACLParser.parse_sem_ver(raw, regex):
                     start_pos
@@ -199,6 +199,21 @@ class KACLDocument:
         validation_results = self.validate()
         return validation_results.is_valid()
 
+    def has_changes(self):
+        unreleased_version = self.get('Unreleased')
+        if not unreleased_version:
+            return False
+
+        sections = unreleased_version.sections()
+        if not sections or len(sections) == 0:
+            return False
+
+        for pair in sections.items():
+            if pair[1] and len(pair[1].items()) > 0:
+                return True
+
+        return False
+
     def add(self, section, data):
         """adds a new change to a given section in the 'unreleased' version
 
@@ -213,7 +228,7 @@ class KACLDocument:
         unreleased_version.add(section.capitalize(), data)
 
     def release(self, version, link=None):
-        """Creates a new release version by copying the 'unreleased' changes into the 
+        """Creates a new release version by copying the 'unreleased' changes into the
         new version
 
         Arguments:
@@ -222,6 +237,27 @@ class KACLDocument:
         Keyword Arguments:
             link {[str]} -- url the version will be linked with (default: {None})
         """
+
+        # check that version is a valid semantic version
+        semver.parse(version) # --> will throw a ValueError if version is not a valid semver
+
+        # check if there are changes to release
+        if self.has_changes() is False:
+            raise Exception("The current changlog has no changes. You can only release if changes are available.")
+
+        # check if the version already exists
+        if self.get(version) != None:
+            raise Exception(f"The version '{version}' already exists in the changelog. You cannot release the same version twice.")
+
+        # check if new version is greater than the last one
+        #   1. there has to be an 'unreleased' section
+        #   2. All other versions are in descending order
+        version_list = self.versions()
+        if len(version_list) > 1: # versions[0] --> unreleased
+            last_version = version_list[1].version()
+            if semver.compare(version, last_version) < 1:
+                raise Exception(f"The version '{version}' cannot be released since it is smaller than the preceeding version '{last_version}'.")
+
         # get current unreleased changes
         unreleased_version = self.get('Unreleased')
 
@@ -257,7 +293,8 @@ class KACLDocument:
         Returns:
             [KACLElement] -- object holding all information of the top level heading
         """
-        return self.__headers[0]
+        if self.__headers and len(self.__headers) > 0:
+            return self.__headers[0]
 
     def title(self):
         """Returns the title of the changelog
@@ -265,7 +302,7 @@ class KACLDocument:
         Returns:
             [str] -- title of the changelog
         """
-        if self.__headers[0]:
+        if self.__headers and len(self.__headers) > 0:
             return self.__headers[0].title()
         return None
 

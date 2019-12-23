@@ -53,8 +53,6 @@ pip3 install python-kacl
 
 ### Docker
 
-The kacl-cli requires [pony-stable](https://github.com/ponylang/pony-stable) to be installed.
-
 ```bash
 docker pull mschmieder/kacl-cli:latest
 ```

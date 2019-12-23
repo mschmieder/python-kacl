@@ -76,8 +76,13 @@ class TestKacl(TestCase):
             os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
         changelog = kacl.load(changlog_file)
 
+        self.assertFalse(changelog.has_changes())
+
         msg = 'This is my first added change'
         changelog.add('Added', msg)
+
+        self.assertTrue(changelog.has_changes())
+
         changelog.release(version='2.0.0', link='https://my-new-version/2.0.0.html')
 
         changelog_dump = kacl.dump(changelog)
@@ -111,3 +116,45 @@ class TestKacl(TestCase):
     def test_load_empty(self):
         changelog = kacl.parse("")
         self.assertFalse(changelog.is_valid())
+
+    def test_release_without_changes(self):
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_no_unreleased.md")
+        changelog = kacl.load(changlog_file)
+
+        self.assertFalse(changelog.has_changes())
+        self.assertRaises(Exception, changelog.release, "1.1.1", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
+
+
+    def test_release_existing_version(self):
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+        changelog = kacl.load(changlog_file)
+
+        msg = 'This is my first added change'
+        changelog.add('Added', msg)
+
+        self.assertTrue(changelog.has_changes())
+        self.assertRaises(Exception, changelog.release, "1.0.0", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
+
+    def test_release_without_older_version(self):
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+        changelog = kacl.load(changlog_file)
+
+        msg = 'This is my first added change'
+        changelog.add('Added', msg)
+
+        self.assertTrue(changelog.has_changes())
+        self.assertRaises(Exception, changelog.release, "0.9.0", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
+
+    def test_release_withnon_semver(self):
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+        changelog = kacl.load(changlog_file)
+
+        msg = 'This is my first added change'
+        changelog.add('Added', msg)
+
+        self.assertTrue(changelog.has_changes())
+        self.assertRaises(Exception, changelog.release, "a0.9.0", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )

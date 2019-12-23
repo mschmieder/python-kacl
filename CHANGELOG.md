@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
+- added checks for `release` function that now checks if there are *available changes*, *already used version* and *valid semver in descending order*
 - added default content checks
 - cli will now check for valid semantic version when using `release` command
 - implemented basic cli with `new`, `get`, `release`, `verify`
