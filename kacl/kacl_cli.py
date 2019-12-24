@@ -11,9 +11,12 @@ import json
 import semver
 import traceback
 import git
+from datetime import datetime
+
 
 def prefixed_environ():
     return dict((("${}".format(key), value) for key, value in os.environ.items()))
+
 
 @click.group(invoke_without_command=True)
 @click.option('-v', '--version', is_flag=True, required=False, help='Prints the current version of the CLI.')
@@ -39,12 +42,11 @@ def cli(ctx, version, config, file):
 
         # read the changelog
         kacl_changelog = kacl.load(kacl_config.changelog_file())
-        kacl_changelog.set_config(config)
+        kacl_changelog.set_config(kacl_config)
 
         # share the objects
         ctx.obj['changelog'] = kacl_changelog
         ctx.obj['changelog_filepath'] = changelog_file
-
 
 
 @cli.command()
@@ -85,7 +87,8 @@ def get(ctx, version):
         kacl_changelog_content = kacl.dump(kacl_version)
         click.echo(kacl_changelog_content)
     else:
-        click.echo(click.style("Error: ", fg='red') + f'"{version}" could not be found in changelog.')
+        click.echo(click.style("Error: ", fg='red') +
+                   f'"{version}" could not be found in changelog.')
         sys.exit(1)
 
 
@@ -119,19 +122,19 @@ def verify(ctx, as_json):
                 char_indicator = 0
 
             click.echo(bold + kacl_changelog_filepath + ':' +
-                    f'{error.line_number()}:{char_indicator}: ' +
-                    red + 'error: ' +
-                    white + error.error_message() +
-                    chalk.RESET)
+                       f'{error.line_number()}:{char_indicator}: ' +
+                       red + 'error: ' +
+                       white + error.error_message() +
+                       chalk.RESET)
 
             if error.line():
                 click.echo(error.line())
                 if start_char_pos != None and end_char_pos != None:
                     mark_length = end_char_pos-start_char_pos-1
                     click.echo(' '*start_char_pos +
-                            green + '^' +
-                            '~'*(mark_length) +
-                            chalk.RESET)
+                               green + '^' +
+                               '~'*(mark_length) +
+                               chalk.RESET)
         if not valid:
             click.echo(f'{len(validation.errors())} error(s) generated.')
         else:
@@ -147,9 +150,12 @@ def verify(ctx, as_json):
 @click.option('-m', '--modify', is_flag=True, help='This option will add the changes directly into changelog file.')
 @click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with.', show_default=True)
 @click.option('-c', '--commit', is_flag=True, help='If passed this will create a git commit with the changed Changelog.')
+@click.option('--commit-message', required=False, default=None, type=str, help='The commit message to use when using --commit flag')
 @click.option('-t', '--tag', is_flag=True, help='If passed this will create a git tag for the newly released version.')
+@click.option('--tag-name', required=False, default=None, type=str, help='The tag name to use when using --tag flag')
+@click.option('--tag-description', required=False, default=None, type=str, help='The tag description text to use when using --tag flag')
 @click.option('-d', '--allow-dirty', is_flag=True, help='If passed this will allow to commit/tag even on a "dirty".')
-def release(ctx, version, modify, link, commit, tag, allow_dirty):
+def release(ctx, version, modify, link, commit, commit_message, tag, tag_name, tag_description, allow_dirty):
     """Creates a release for the latest 'unreleased' changes. Use '--modify' to directly modify the changelog file.
     You can automatically use the latest version by using the version keywords 'major', 'minor', 'patch'
 
@@ -167,15 +173,20 @@ def release(ctx, version, modify, link, commit, tag, allow_dirty):
     increment = None
     if version in ['major', 'minor', 'patch']:
         increment = version
-        version = None # reset
+        version = None  # reset
     else:
         # check if version is a valid semantic version
         try:
             semver.parse(version)
         except:
             click.echo(click.style("Error: ", fg='red') +
-                    f'"{version}" not a valid semantic version.')
+                       f'"{version}" not a valid semantic version.')
             sys.exit(1)
+
+    if not kacl_changelog.has_changes():
+        click.echo(click.style("Error: ", fg='red') +
+                   'The current changlog has no changes. You can only release if changes are available.')
+        sys.exit(1)
 
     # get the latest_version before the release
     latest_version = kacl_changelog.current_version()
@@ -196,33 +207,40 @@ def release(ctx, version, modify, link, commit, tag, allow_dirty):
         f.close()
 
         if commit or tag or kacl_config.git_create_commit() or kacl_config.git_create_tag():
-                vcs_context = {
-                    "latest_version": latest_version,
-                    "new_version": new_version,
-                }
-                time_context = {
-                    'now': datetime.now(),
-                    'utcnow': datetime.utcnow(),
-                }
-                vcs_context.update(time_context)
-                vcs_context.update(prefixed_environ())
+            vcs_context = {
+                "latest_version": latest_version,
+                "new_version": new_version,
+            }
+            time_context = {
+                'now': datetime.now(),
+                'utcnow': datetime.utcnow(),
+            }
+            vcs_context.update(time_context)
+            vcs_context.update(prefixed_environ())
+
+            commit_message  = commit_message if commit_message != None else kacl_config.git_commit_message()
+            tag_name        = tag_name if tag_name != None else kacl_config.git_tag_name()
+            tag_description = tag_description if tag_description != None else kacl_config.git_tag_description()
+
             try:
                 repo = git.Repo(os.getcwd())
             except git.InvalidGitRepositoryError:
-                click.echo(click.style("Error: ", fg='red') + f'"{os.getcwd()}" is no valid git repository.')
+                click.echo(click.style("Error: ", fg='red') +
+                           f'"{os.getcwd()}" is no valid git repository.')
 
             if not repo.is_dirty() and not allow_dirty:
-                click.echo(click.style("Error: ", fg='red') + f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
+                click.echo(click.style("Error: ", fg='red') +
+                           f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
 
             if commit or kacl_config.git_create_commit():
                 repo.git.add(kacl_config.changelog_file())
                 for f in kacl_config.git_commit_additional_files():
                     repo.git.add(f)
-                repo.git.commit('-m', kacl_config.git_commit_message().format(**vcs_contect))
+                repo.git.commit('-m', commit_message.format(**vcs_context))
 
             if tag or kacl_config.git_create_tag():
-                repo.create_tag(kacl_config.git_tag_name().format(**vcs_context),
-                                message=kacl_config.git_tag_description().format(**vcs_context))
+                repo.create_tag(tag_name.format(**vcs_context),
+                                message=tag_description.format(**vcs_context))
 
     else:
         click.echo(kacl_changelog_content)
@@ -242,15 +260,18 @@ def new(output_file):
     else:
         click.echo(kacl_changelog_content)
 
+
 def start():
     try:
         cli(obj={})
     except SystemExit as e:
         sys.exit(e.code)
     except:
-        click.secho('Unexpected error occured. Make sure your file is a valid Mardown file.', fg='red')
+        click.secho(
+            'Unexpected error occured. Make sure your file is a valid Mardown file.', fg='red')
         click.echo(traceback.format_exc())
         sys.exit(1)
+
 
 if __name__ == '__main__':
     start()

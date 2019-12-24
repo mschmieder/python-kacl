@@ -161,6 +161,12 @@ kacl-cli verify --json
 
 ## Print a single release changelog
 
+**Messages (--commit-message, --tag-name, --tag-description)**
+
+This is templated using the Python Format String Syntax. Available in the template context are `latest_version` and `new_version` as well as all `environment variables` (prefixed with \$).
+You can also use the variables `now` or `utcnow` to get a current timestamp. Both accept datetime formatting (when used like as in `{now:%d.%m.%Y}`).
+Also available as --message (e.g.: kacl-cli release patch --commit --commit--message '[{now:%Y-%m-%d}] Jenkins Build {$BUILD_NUMBER}: {new_version}')
+
 **Usage**
 
 ```bash
@@ -202,8 +208,8 @@ kacl-cli add changed 'And changed things a bit' --modify
 Usage: kacl-cli release [OPTIONS] VERSION
 
   Creates a release for the latest 'unreleased' changes. Use '--modify' to
-  directly modify the changelog file.     You can automatically use the
-  latest version by using the version keywords 'major', 'minor', 'patch'
+  directly modify the changelog file. You can automatically use the latest
+  version by using the version keywords 'major', 'minor', 'patch'
 
   Example:
 
@@ -212,9 +218,20 @@ Usage: kacl-cli release [OPTIONS] VERSION
       kacl-cli release major|minor|patch
 
 Options:
-  -m, --modify     This option will add the changes directly into changelog
-                   file.
-  -l, --link TEXT  A url that the version will be
+  -m, --modify            This option will add the changes directly into
+                          changelog file.
+  -l, --link TEXT         A url that the version will be linked with.
+  -c, --commit            If passed this will create a git commit with the
+                          changed Changelog.
+  --commit-message TEXT   The commit message to use when using --commit flag
+  -t, --tag               If passed this will create a git tag for the newly
+                          released version.
+  --tag-name TEXT         The tag name to use when using --tag flag
+  --tag-description TEXT  The tag description text to use when using --tag
+                          flag
+  -d, --allow-dirty       If passed this will allow to commit/tag even on a
+                          "dirty".
+  --help                  Show this message and exit.
 ```
 
 **Usage with fixed version**

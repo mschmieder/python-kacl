@@ -1,7 +1,7 @@
 import os
 
 class KACLConfig:
-    def __init__(self, config_file):
+    def __init__(self, config_file=None):
         self.__allowed_header_titles = ['Changelog', 'Change Log']
 
         self.__allowed_version_sections = ["Added",
@@ -24,8 +24,8 @@ class KACLConfig:
         self.__git_commit_additional_files = []
 
         self.__git_create_tag = False
-        self.__git_tag_name = "v{latest_version}"
-        self.__git_tag_description = "Released version: {latest_version}"
+        self.__git_tag_name = "v{new_version}"
+        self.__git_tag_description = "Released version: {new_version}"
 
     def is_case_sensitive(self):
         return self.__case_sensitive
@@ -56,6 +56,9 @@ class KACLConfig:
 
     def git_create_commit(self):
         return self.__git_create_commit
+
+    def git_commit_message(self):
+        return self.__git_commit_message
 
     def git_commit_additional_files(self):
         return self.__git_commit_additional_files
