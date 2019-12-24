@@ -135,20 +135,33 @@ def verify(ctx, as_json):
 @click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with.', show_default=True)
 def release(ctx, version, modify, link):
     """Creates a release for the latest 'unreleased' changes. Use '--modify' to directly modify the changelog file.
+    You can automatically use the latest version by using the version keywords 'major', 'minor', 'patch'
+
+    Example:
+
+        kacl-cli release 1.0.0
+
+        kacl-cli release major|minor|patch
     """
     kacl_changelog = ctx.obj['changelog']
     kacl_changelog_filepath = ctx.obj['changelog_filepath']
 
-    # check if version is a valid semantic version
-    try:
-        semver.parse(version)
-    except:
-        click.echo(click.style("Error: ", fg='red') +
-                   f'"{version}" not a valid semantic version.')
-        sys.exit(1)
+    # check if the version string indicates automatic increment
+    increment = None
+    if version in ['major', 'minor', 'patch']:
+        increment = version
+        version = None # reset
+    else:
+        # check if version is a valid semantic version
+        try:
+            semver.parse(version)
+        except:
+            click.echo(click.style("Error: ", fg='red') +
+                    f'"{version}" not a valid semantic version.')
+            sys.exit(1)
 
     # release changes
-    kacl_changelog.release(version=version, link=link)
+    kacl_changelog.release(version=version, link=link, increment=increment)
     kacl_changelog_content = kacl.dump(kacl_changelog)
     if modify:
         with open(kacl_changelog_filepath, 'w') as f:

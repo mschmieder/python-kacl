@@ -227,16 +227,29 @@ class KACLDocument:
             self.__versions.insert(0, unreleased_version)
         unreleased_version.add(section.capitalize(), data)
 
-    def release(self, version, link=None):
+    def release(self, version=None, link=None, increment=None):
         """Creates a new release version by copying the 'unreleased' changes into the
         new version
 
-        Arguments:
-            version {[str]} -- semantic versioning string
-
         Keyword Arguments:
             link {[str]} -- url the version will be linked with (default: {None})
+            version {[str]} -- semantic versioning string
+            increment {[str]} -- use either 'patch', 'minor', or 'major' to automatically increment the last version
         """
+
+        if increment:
+            v = self.current_version()
+            if v:
+                sv = semver.VersionInfo.parse(v)
+                if 'patch' == increment:
+                    sv = sv.bump_patch()
+                elif 'minor' == increment:
+                    sv = sv.bump_minor()
+                elif 'major' == increment:
+                    sv = sv.bump_major()
+                version = str(sv)
+            else:
+                raise Exception("No previously released version found. Incrementing not possible")
 
         # check that version is a valid semantic version
         semver.parse(version) # --> will throw a ValueError if version is not a valid semver
@@ -286,6 +299,17 @@ class KACLDocument:
                and version.capitalize() == x.version()]
         if res and len(res):
             return res[0]
+
+    def current_version(self):
+        """returns the current version (last released)
+
+        Returns:
+            [str] -- latest released version, None if none is available
+        """
+        version_list = self.versions()
+        for v in version_list:
+            if v.version().lower() != 'unreleased':
+                return v.version()
 
     def header(self):
         """Gives access to the top level heading element

@@ -202,19 +202,25 @@ kacl-cli add changed 'And changed things a bit' --modify
 Usage: kacl-cli release [OPTIONS] VERSION
 
   Creates a release for the latest 'unreleased' changes. Use '--modify' to
-  directly modify the changelog file.
+  directly modify the changelog file.     You can automatically use the
+  latest version by using the version keywords 'major', 'minor', 'patch'
+
+  Example:
+
+      kacl-cli release 1.0.0
+
+      kacl-cli release major|minor|patch
 
 Options:
   -m, --modify     This option will add the changes directly into changelog
-                   file
-  -l, --link TEXT  A url that the version will be linked with
-  --help           Show this message and exit.
+                   file.
+  -l, --link TEXT  A url that the version will be
 ```
 
-**Usage**
+**Usage with fixed version**
 
 ```bash
-kacl-cli release 0.13.1
+kacl-cli release 1.0.0
 ```
 
 Example CHANGELOG.md (before):
@@ -231,6 +237,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - cli will now check for valid semantic version when using `release` command
 - implemented basic cli with `new`, `get`, `release`, `verify`
 - added `--json` option to `verify` command
+
+## 0.1.0 - 2019-12-12
+### Added
+- initial release
 
 [Unreleased]: https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD
 ```
@@ -251,6 +261,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - cli will now check for valid semantic version when using `release` command
 - implemented basic cli with `new`, `get`, `release`, `verify`
 - added `--json` option to `verify` command
+
+## 0.1.0 - 2019-12-12
+### Added
+- initial release
+
+[Unreleased]: https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD
+```
+
+**Usage with version increment**
+
+```bash
+kacl-cli release patch
+```
+
+Example CHANGELOG.md (after):
+
+```markdown
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## 0.1.1 - 2019-12-22
+### Added
+- added default content checks
+- cli will now check for valid semantic version when using `release` command
+- implemented basic cli with `new`, `get`, `release`, `verify`
+- added `--json` option to `verify` command
+
+## 0.1.0 - 2019-12-12
+### Added
+- initial release
 
 [Unreleased]: https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD
 ```

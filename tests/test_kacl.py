@@ -158,3 +158,24 @@ class TestKacl(TestCase):
 
         self.assertTrue(changelog.has_changes())
         self.assertRaises(Exception, changelog.release, "a0.9.0", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
+
+
+    def test_release_with_increment(self):
+        tests = {
+            "major": "2.0.0",
+            "minor": "1.1.0",
+            "patch": "1.0.1"
+        }
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+
+        for increment, expected_version in tests.items():
+            changelog = kacl.load(changlog_file)
+
+            msg = 'This is my first added change'
+            changelog.add('Added', msg)
+
+            self.assertTrue(changelog.has_changes())
+            changelog.release(increment = increment)
+            self.assertEqual(expected_version, changelog.current_version())
+
