@@ -10,6 +10,10 @@ import click
 import json
 import semver
 import traceback
+import git
+
+def prefixed_environ():
+    return dict((("${}".format(key), value) for key, value in os.environ.items()))
 
 @click.group(invoke_without_command=True)
 @click.option('-v', '--version', is_flag=True, required=False, help='Prints the current version of the CLI.')
@@ -29,9 +33,18 @@ def cli(ctx, version, config, file):
                        f"{changelog_file} not found")
             sys.exit(1)
 
-        kacl_changelog = kacl.load(changelog_file)
+        kacl_config = kacl.KACLConfig(config)
+        if file:
+            kacl_config.set_changelog_file(file)
+
+        # read the changelog
+        kacl_changelog = kacl.load(kacl_config.changelog_file())
+        kacl_changelog.set_config(config)
+
+        # share the objects
         ctx.obj['changelog'] = kacl_changelog
         ctx.obj['changelog_filepath'] = changelog_file
+
 
 
 @cli.command()
@@ -133,7 +146,10 @@ def verify(ctx, as_json):
 @click.argument('version', type=str)
 @click.option('-m', '--modify', is_flag=True, help='This option will add the changes directly into changelog file.')
 @click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with.', show_default=True)
-def release(ctx, version, modify, link):
+@click.option('-c', '--commit', is_flag=True, help='If passed this will create a git commit with the changed Changelog.')
+@click.option('-t', '--tag', is_flag=True, help='If passed this will create a git tag for the newly released version.')
+@click.option('-d', '--allow-dirty', is_flag=True, help='If passed this will allow to commit/tag even on a "dirty".')
+def release(ctx, version, modify, link, commit, tag, allow_dirty):
     """Creates a release for the latest 'unreleased' changes. Use '--modify' to directly modify the changelog file.
     You can automatically use the latest version by using the version keywords 'major', 'minor', 'patch'
 
@@ -144,6 +160,7 @@ def release(ctx, version, modify, link):
         kacl-cli release major|minor|patch
     """
     kacl_changelog = ctx.obj['changelog']
+    kacl_config = kacl_changelog.config()
     kacl_changelog_filepath = ctx.obj['changelog_filepath']
 
     # check if the version string indicates automatic increment
@@ -160,13 +177,53 @@ def release(ctx, version, modify, link):
                     f'"{version}" not a valid semantic version.')
             sys.exit(1)
 
+    # get the latest_version before the release
+    latest_version = kacl_changelog.current_version()
+
     # release changes
     kacl_changelog.release(version=version, link=link, increment=increment)
+
+    # get the new version
+    new_version = kacl_changelog.current_version()
+
+    # dump the content
     kacl_changelog_content = kacl.dump(kacl_changelog)
+
+    # check if we should modify the file
     if modify:
         with open(kacl_changelog_filepath, 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
+
+        if commit or tag or kacl_config.git_create_commit() or kacl_config.git_create_tag():
+                vcs_context = {
+                    "latest_version": latest_version,
+                    "new_version": new_version,
+                }
+                time_context = {
+                    'now': datetime.now(),
+                    'utcnow': datetime.utcnow(),
+                }
+                vcs_context.update(time_context)
+                vcs_context.update(prefixed_environ())
+            try:
+                repo = git.Repo(os.getcwd())
+            except git.InvalidGitRepositoryError:
+                click.echo(click.style("Error: ", fg='red') + f'"{os.getcwd()}" is no valid git repository.')
+
+            if not repo.is_dirty() and not allow_dirty:
+                click.echo(click.style("Error: ", fg='red') + f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
+
+            if commit or kacl_config.git_create_commit():
+                repo.git.add(kacl_config.changelog_file())
+                for f in kacl_config.git_commit_additional_files():
+                    repo.git.add(f)
+                repo.git.commit('-m', kacl_config.git_commit_message().format(**vcs_contect))
+
+            if tag or kacl_config.git_create_tag():
+                repo.create_tag(kacl_config.git_tag_name().format(**vcs_context),
+                                message=kacl_config.git_tag_description().format(**vcs_context))
+
     else:
         click.echo(kacl_changelog_content)
 

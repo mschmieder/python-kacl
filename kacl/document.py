@@ -338,6 +338,12 @@ class KACLDocument:
         """
         return self.__versions
 
+    def set_config(self, config):
+        self.__config = config
+
+    def config(self):
+        return self.__config
+
     @staticmethod
     def init():
         return KACLDocument.parse("""# Changelog

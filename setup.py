@@ -28,11 +28,14 @@ setup(name='python-kacl',
       install_requires=[
           'click',
           'semver',
-          'pychalk'
+          'pychalk',
+          'gitpython'
       ],
       zip_safe=False,
       classifiers= [
           "License :: OSI Approved :: MIT License",
           "Programming Language :: Python :: 3",
-          "Programming Language :: Python :: 3.6"
+          "Programming Language :: Python :: 3.6",
+          "Intended Audience :: Developers",
+          "Topic :: Software Development :: Version Control"
       ])
