@@ -26,7 +26,7 @@ jobs:
   - stage: analyse
     script:
     - git fetch --unshallow
-    - sonar-scanner
+    - sonar-scanner --with-coverage --coverage-report xml
   - stage: deploy
     deploy:
     - provider: pypi
