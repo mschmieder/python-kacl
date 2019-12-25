@@ -15,8 +15,8 @@ python:
 - 3.8
 install:
 - pip install .
-- pip install nose2
-script: nose2 -v
+- pip install nose2 "nose2[coverage_plugin]"
+script: nose2 -v --with-coverage --coverage-report xml
 jobs:
   include:
   - stage: docker
@@ -26,8 +26,7 @@ jobs:
   - stage: analyse
     script:
     - git fetch --unshallow
-    - pip3 install "nose2[coverage_plugin]"
-    - sonar-scanner --with-coverage --coverage-report xml
+    - sonar-scanner
   - stage: deploy
     deploy:
     - provider: pypi
