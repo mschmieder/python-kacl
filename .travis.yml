@@ -24,8 +24,11 @@ jobs:
     - docker
     script: docker build -t mschmieder/kacl-cli .
   - stage: analyse
+    python: 3.6
     script:
     - git fetch --unshallow
+    - pip install nose2 "nose2[coverage_plugin]"
+    - nose2 -v --with-coverage --coverage-report xml
     - sonar-scanner
   - stage: deploy
     deploy:
