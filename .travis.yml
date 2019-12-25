@@ -25,6 +25,7 @@ jobs:
     script: docker build -t mschmieder/kacl-cli .
   - stage: analyse
     script:
+    - git fetch --unshallow
     - sonar-scanner
   - stage: deploy
     deploy:
