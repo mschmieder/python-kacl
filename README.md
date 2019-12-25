@@ -1,6 +1,8 @@
 # python-kacl
 
 [![Build Status](https://travis-ci.org/mschmieder/python-kacl.svg?branch=master)](https://travis-ci.org/mschmieder/python-kacl)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mschmieder_python-kacl&metric=coverage)](https://sonarcloud.io/dashboard?id=mschmieder_python-kacl)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=mschmieder_python-kacl&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=mschmieder_python-kacl)
 
 A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**og](https://keepachangelog.com/en/1.0.0/) format.
 
