@@ -31,22 +31,17 @@ jobs:
     - nose2 -v --with-coverage --coverage-report xml
     - sonar-scanner
   - stage: release
-    services:
-    - docker
     python: 3.6
     install:
     - git config --global user.email "travis@travis-ci.org"
     - git config --global user.name "Travis CI"
     - git remote add github https://${GH_TOKEN}@github.com/mschmieder/kacl-cli.git > /dev/null 2>&1
-    - pip install bumpversion
+    - pip install bumpversion python-kacl
     script:
     - git checkout master
     - bumpversion patch
-    - docker run -v $(pwd):$(pwd) -w $(pwd) mschmieder/kacl-cli:latest
-      release patch
-      --commit-message "[skip ci] New version {latest_version} -> {new_version}
-      --modify
-    - git push --quiet --set-upstream github master --tags
+    - kacl-cli release patch --commit --commit-message "[skip ci] New version {latest_version} -> {new_version}" --modify
+    - git push --tags --quiet --set-upstream github master
     branches:
       only:
       - master

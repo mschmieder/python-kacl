@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - added git support to the `release` command. When using `--tag/--commit` changes will be tracked by git
 - added support for simple version increment. User `kacl-cli release [major|minor|patch]`
 
+## 0.2.7 - 2019-12-25
+- imporved CI
+
 ## 0.2.6 - 2019-12-23
 ### Fixed
 - fixed issue where `--version` resulted in error if no CHANGELOG.md file was found within the execution directory
