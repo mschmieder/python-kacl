@@ -1,4 +1,10 @@
 language: python
+
+addons:
+  sonarcloud:
+    organization: "mschmieder" # the key of the org you chose at step #3
+    token:
+      secure: "RZ0VH0HaMBLVDDXXLF6eMclQFsN01P+SQIuSE+sYv6ze3AEqA7FH7SFNPgwH/b8NBumE8cOyHgWeZAZCaZArxAcH1xGmUm0CPlxn5fTtY0dOCntAXISzGCgESG0RKq+M2yB8tomefJl3N3F2lBwPtAr8ObbTPo8IiEjCvpoQxgRxRwoz31W1S0GLNBZBJw33dfhv7w0gpAvO4VBGKoo13y3eJMHS0EYfWbzCGXLtnUOKqcUpP+KiXFRMz6qe3U/H7HmiXTi8h/skI+pMKeFk/j3fKtq/bDGLQZvu0StQ7vs8bMZXwa6DaS0uBoVcB/axyT08yWHx02Szgu49mm9Fi8yC+f9/7SP1T3zOF10EuJn+iQmN+AqR4jB4d76Bdmn9IzX5EOCT2q+zupYjDCF1vNmhp5q93hJ2Awqi7xJkH/JO/bJgeP5gOfrVaZmSRTQ7gvsTWfTYcPhFnDkPbXk1/QqeymTqqhQ8eVdJf6lurXVKGYOAOsewOpnXQOSYDSTJu9rHqWKfFAPqLi7kfAWXDhcpOQr5UueDX84772sjd7sixX+xHQf+XBFD8H/vzpR0z1eo7KJOiD3tQFzdsBDkWRbdZQ0J0FcuOcrrrPr+3oAtaNE0pDoOeOdbW/KHY/+frKh2sGMbWtWR+iYAogHT0HhXIjjk3jV56yn1XysRy8Q="
 env:
   global:
   - secure: UMfs6l0LOwNXURIXONRnT012TH7qcyedXpAhBvCyPudtMtrr48lqzOG1P553nASQhpIoHiN/QKDtNs9nvj5wmZ9QlfwYyhx/wsTDcQFyecZ8FUnal/N1YABatvSF97rcZA25y+84QPp1nFjujGgzSrrMu+B3dipa7Bge//fPACsnNuw8q2B2nuRdfSsJtTv3t4yfaJpHHzdLD4dfJk9Mj/Cx+32u4zNxgpRZfRqnfMD7LbezUukm2ilGBcbwfjNhQ1o9W7roiYDJy+QJvq/LnRhofsH0XCsTSZBIwPJl3Ypvk+Ea9vZuyqWmVaTxS1NFkyVDle6v9moih5Tsztz3mm/h0L33Q2eJ+ZL/WQMbkdRh+1mVfSvuXbPWDX5lkpNQtm2VplA8P9EX+EhF8tPqu6TusIIPs1gnENg0Z3+sNLlvL8oauEfdBdXZ4A6UIm2hVGk9w5FQ9FWjh4k+Nc89bPoUqHw3UDjT+5cvaY9OuySA0Yl8Po9Emng84MYaad0dikmvijvN1HB01SAei5383Pgm95CqmpgDLsF7UXk1i7YYkqBSDfZx25TfBMZcf8jEYN8qNnJ6fzZ7j0mxut0LzQ+pa6MnCyR4a8poIdXBrOjL0MYE3vlQSBO/F4Rt7CZCUYWh0MWpl8Tx/PQvqlqDHmq5jNRW3kAgD+U15Duo6OA=
@@ -17,6 +23,9 @@ jobs:
     services:
     - docker
     script: docker build -t mschmieder/kacl-cli .
+  - stage: analyse
+    script:
+    - sonar-scanner
   - stage: deploy
     deploy:
     - provider: pypi
