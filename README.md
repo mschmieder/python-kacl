@@ -1,5 +1,7 @@
 # python-kacl
 
+[![Build Status](https://travis-ci.org/mschmieder/python-kacl.svg?branch=master)](https://travis-ci.org/mschmieder/python-kacl)
+
 A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**og](https://keepachangelog.com/en/1.0.0/) format.
 
 - [python-kacl](#python-kacl)
@@ -161,12 +163,6 @@ kacl-cli verify --json
 
 ## Print a single release changelog
 
-**Messages (--commit-message, --tag-name, --tag-description)**
-
-This is templated using the Python Format String Syntax. Available in the template context are `latest_version` and `new_version` as well as all `environment variables` (prefixed with \$).
-You can also use the variables `now` or `utcnow` to get a current timestamp. Both accept datetime formatting (when used like as in `{now:%d.%m.%Y}`).
-Also available as --message (e.g.: kacl-cli release patch --commit --commit--message '[{now:%Y-%m-%d}] Jenkins Build {$BUILD_NUMBER}: {new_version}')
-
 **Usage**
 
 ```bash
@@ -233,6 +229,13 @@ Options:
                           "dirty".
   --help                  Show this message and exit.
 ```
+
+**Messages (--commit-message, --tag-name, --tag-description)**
+
+This is templated using the Python Format String Syntax. Available in the template context are `latest_version` and `new_version` as well as all `environment variables` (prefixed with \$).
+You can also use the variables `now` or `utcnow` to get a current timestamp. Both accept datetime formatting (when used like as in `{now:%d.%m.%Y}`).
+Also available as --message (e.g.: kacl-cli release patch --commit --commit--message '[{now:%Y-%m-%d}] Jenkins Build {$BUILD_NUMBER}: {new_version}')
+
 
 **Usage with fixed version**
 
