@@ -26,6 +26,7 @@ jobs:
   - stage: analyse
     script:
     - git fetch --unshallow
+    - pip3 install "nose2[coverage_plugin]"
     - sonar-scanner --with-coverage --coverage-report xml
   - stage: deploy
     deploy:
