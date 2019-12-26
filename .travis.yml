@@ -35,7 +35,7 @@ jobs:
     install:
     - git config --global user.email "travis@travis-ci.org"
     - git config --global user.name "Travis CI"
-    - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/kacl-cli.git
+    - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/python-kacl.git
       > /dev/null 2>&1
     - pip install bumpversion python-kacl
     script:
