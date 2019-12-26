@@ -1,14 +1,14 @@
 language: python
-
 addons:
   sonarcloud:
-    organization: "mschmieder" # the key of the org you chose at step #3
+    organization: mschmieder
     token:
-      secure: "RZ0VH0HaMBLVDDXXLF6eMclQFsN01P+SQIuSE+sYv6ze3AEqA7FH7SFNPgwH/b8NBumE8cOyHgWeZAZCaZArxAcH1xGmUm0CPlxn5fTtY0dOCntAXISzGCgESG0RKq+M2yB8tomefJl3N3F2lBwPtAr8ObbTPo8IiEjCvpoQxgRxRwoz31W1S0GLNBZBJw33dfhv7w0gpAvO4VBGKoo13y3eJMHS0EYfWbzCGXLtnUOKqcUpP+KiXFRMz6qe3U/H7HmiXTi8h/skI+pMKeFk/j3fKtq/bDGLQZvu0StQ7vs8bMZXwa6DaS0uBoVcB/axyT08yWHx02Szgu49mm9Fi8yC+f9/7SP1T3zOF10EuJn+iQmN+AqR4jB4d76Bdmn9IzX5EOCT2q+zupYjDCF1vNmhp5q93hJ2Awqi7xJkH/JO/bJgeP5gOfrVaZmSRTQ7gvsTWfTYcPhFnDkPbXk1/QqeymTqqhQ8eVdJf6lurXVKGYOAOsewOpnXQOSYDSTJu9rHqWKfFAPqLi7kfAWXDhcpOQr5UueDX84772sjd7sixX+xHQf+XBFD8H/vzpR0z1eo7KJOiD3tQFzdsBDkWRbdZQ0J0FcuOcrrrPr+3oAtaNE0pDoOeOdbW/KHY/+frKh2sGMbWtWR+iYAogHT0HhXIjjk3jV56yn1XysRy8Q="
+      secure: RZ0VH0HaMBLVDDXXLF6eMclQFsN01P+SQIuSE+sYv6ze3AEqA7FH7SFNPgwH/b8NBumE8cOyHgWeZAZCaZArxAcH1xGmUm0CPlxn5fTtY0dOCntAXISzGCgESG0RKq+M2yB8tomefJl3N3F2lBwPtAr8ObbTPo8IiEjCvpoQxgRxRwoz31W1S0GLNBZBJw33dfhv7w0gpAvO4VBGKoo13y3eJMHS0EYfWbzCGXLtnUOKqcUpP+KiXFRMz6qe3U/H7HmiXTi8h/skI+pMKeFk/j3fKtq/bDGLQZvu0StQ7vs8bMZXwa6DaS0uBoVcB/axyT08yWHx02Szgu49mm9Fi8yC+f9/7SP1T3zOF10EuJn+iQmN+AqR4jB4d76Bdmn9IzX5EOCT2q+zupYjDCF1vNmhp5q93hJ2Awqi7xJkH/JO/bJgeP5gOfrVaZmSRTQ7gvsTWfTYcPhFnDkPbXk1/QqeymTqqhQ8eVdJf6lurXVKGYOAOsewOpnXQOSYDSTJu9rHqWKfFAPqLi7kfAWXDhcpOQr5UueDX84772sjd7sixX+xHQf+XBFD8H/vzpR0z1eo7KJOiD3tQFzdsBDkWRbdZQ0J0FcuOcrrrPr+3oAtaNE0pDoOeOdbW/KHY/+frKh2sGMbWtWR+iYAogHT0HhXIjjk3jV56yn1XysRy8Q=
 env:
   global:
   - secure: UMfs6l0LOwNXURIXONRnT012TH7qcyedXpAhBvCyPudtMtrr48lqzOG1P553nASQhpIoHiN/QKDtNs9nvj5wmZ9QlfwYyhx/wsTDcQFyecZ8FUnal/N1YABatvSF97rcZA25y+84QPp1nFjujGgzSrrMu+B3dipa7Bge//fPACsnNuw8q2B2nuRdfSsJtTv3t4yfaJpHHzdLD4dfJk9Mj/Cx+32u4zNxgpRZfRqnfMD7LbezUukm2ilGBcbwfjNhQ1o9W7roiYDJy+QJvq/LnRhofsH0XCsTSZBIwPJl3Ypvk+Ea9vZuyqWmVaTxS1NFkyVDle6v9moih5Tsztz3mm/h0L33Q2eJ+ZL/WQMbkdRh+1mVfSvuXbPWDX5lkpNQtm2VplA8P9EX+EhF8tPqu6TusIIPs1gnENg0Z3+sNLlvL8oauEfdBdXZ4A6UIm2hVGk9w5FQ9FWjh4k+Nc89bPoUqHw3UDjT+5cvaY9OuySA0Yl8Po9Emng84MYaad0dikmvijvN1HB01SAei5383Pgm95CqmpgDLsF7UXk1i7YYkqBSDfZx25TfBMZcf8jEYN8qNnJ6fzZ7j0mxut0LzQ+pa6MnCyR4a8poIdXBrOjL0MYE3vlQSBO/F4Rt7CZCUYWh0MWpl8Tx/PQvqlqDHmq5jNRW3kAgD+U15Duo6OA=
   - secure: ZFja6SrJQB1KAsQWoahPUbWA/IbeRSkOHhZGxv82JUsW81Mr6XUKrUqNLUxSZvvhguD4y0b5e8On/BTqB+829S0CteLGVpbLI6oj0sr+y9o9pskAxoun8XMY3hUzg4RmL/WwU9W78vSpLMRlWS60NwT+nI6QcIvP2uRG5L0jeK8kwnWhB+Ns7z5/CtdGHiE16NvETsE3NHihKXUDhiK+83RT+qfjpQvVCy/wioqe/Ixl2NKJzHhExARNIG7/aViK1e5bQHXo+vUlR7xlrQamFp7z8ZQlrwhWNAP8WCqJrbUHC+8ai1Gsm4Ia62DLsI2RhpMvFd2fR0+1aKySoMV8gVcwFZ0oVQ+9/arC+TII813OnfhBKd/5MpMluCUL2UC1zAOP8shwLDOWVIr8eRzjb/js9eMaz0CqJreoTC81kkBvC5/bM0+JBV6ey4x3tgV9zXR3KfoDU5BYWpyqciTYp+qNk7fmzgGXeuwRFVncj+xxYjuohEZiycJJozpcKuBCjBrWRnb3SD+CyqfckikUFcIMnalqo26xi4SSmYElvHJYtIwHios8K37GEJXybnt94J+V4aircrT3pMmGFTXp+Tpf9+SGbyiGHGd72lSVa31w8FEDWewtt8O3bNCJIbn2GYVxzpAEvrMABrdaQukn8Nm7M0B1W0wS5CV/n6OuZwA=
+  - secure: WWAw49GFNlyGv2DkMvRcpJjVhWGA/xvSszKK+BoEUET3W9u8tL5obdKCoXSXArITQ6RhNjxK5l+13dJqW/kN/GBzCxHyJThPz9z7B8j+Pe9nx1rEpirr12aHwLfs7iJbLKsAr9wKRYnv9Io/t/jyLByI6+YMI/sxW4gWDVnK4pBv2kkLsbD2SyNTj+jZZ1z0kv7Lk6yBhKBj8J+hvEEoBbVdNaZtEe3p4mgPnR3EDLSQn6k3Qc63/6aKbnzh9L4ls3qoS7I8NMi8atLRpSCOJHEcQMnYb5rqOHfe9Zngedkdk9fFLgTR55w/egovye+aHJLqT5LK1pvR2FMCBgnufudacczaXPWxLmh2FijcNwIkPZsI7/+heeAiwdVflxl4jkgQitmy4VRoo36mRHrXRK9ipk78umBikaXGMtUNncAZzG7gSyYyx+EAbLWuVoBjheXZfTs9bOUijRtlMvm//RMZqKfGHaK7za9mu3rUKFLOlrs+CI6OorFeffrZzxImcEUqOanZpbidgNNstpFULlM7jA+kgSUecHePTJRWLD1oAib0I9RJljBp8I98oFb4lQR/2f7e8X03OUrJXHt7z+VJ+OHexdGKMTteQ78jmRnKR2+38gFONBORQeiclkUuJtY31kft0NkYs8CATYiX8unzTcUH5zP/HmwCQ0Vo6GA=
 python:
 - 3.6
 - 3.7
@@ -35,12 +35,14 @@ jobs:
     install:
     - git config --global user.email "travis@travis-ci.org"
     - git config --global user.name "Travis CI"
-    - git remote add github https://${GH_TOKEN}@github.com/mschmieder/kacl-cli.git > /dev/null 2>&1
+    - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/kacl-cli.git
+      > /dev/null 2>&1
     - pip install bumpversion python-kacl
     script:
     - git checkout master
     - bumpversion patch
-    - kacl-cli release patch --tag --commit --commit-message "[skip ci] New version {latest_version} -> {new_version}" --modify
+    - kacl-cli release patch --tag --commit --commit-message "[skip ci] New version
+      {latest_version} -> {new_version}" --modify
     - git push --tags --quiet --set-upstream github master
     branches:
       only:
