@@ -1,5 +1,5 @@
 # Version of the python-kacl package
-__version__ = "0.2.11"
+__version__ = "0.2.12"
 
 from .document import *
 from .serializer import *
