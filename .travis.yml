@@ -43,17 +43,17 @@ jobs:
       bumpversion patch &&
       kacl-cli release patch --tag --commit --commit-message "[ci skip] New version {latest_version} -> {new_version}" --modify &&
       git push --tags --quiet --set-upstream github master
-  - stage: deploy
-    if: tag IS present
     deploy:
     - provider: pypi
       user: __token__
       password:
         secure: f3wUoWwCuMWexRJPButz1JisYF90Rt+OMLk5bjW0fXH6zXOJD7sqPaswUogjJhtiVI/1euQEi1/xC+lSS6pbsgL7mlLbo8KMVQd9O8gYXE6gKAjLAPq4mkU0MBT8UkYGnUQUeFWEh8Gf8a1H8wpzT26sAwgao7WreUoDB/tzY6oOSHttyZr5qYLHSWtvQ515DXhzwWNFUmmt29aknudgutMh9NEhkVMktpPezzu8H53fHsDJiFuZw9zgGcNZaP5loWcm2V5SsqrHeMI04nbprNaC1Ayqdy18q0ulZAEX5nvJ+U3QKnF3mhjgvyTGzh+LDAEFyIDkVfG/TmSshN3dAxDA6hHJdgdgfADhs2kyZPVOF1r6RGh8e51OAaPakiSFLBa3eix8ietodlBQZ+RKSyOu2ibUW/rOXotkrXzaqKrnLiHLWYLpGybfYChx+7R+PRomjm4nYEm2Ngl/D7zLQnLvsIBS57tgSR6Z3Q9LJPiULcvBznzSIWdJzArFONC0VPSDvk6i30PGbr4U6DAoTdCUOTDdKY1XBbOnXrZO2ebLt3ZkE2aoY1gEkbri+/5c4eHQRZ9kOql1I4Nc59tm7XDhB2rQQgerX29iei6aPlA7xSGplFrRPNbndKYqsWpzeyI1g6YhMQKJ62ZhzdK46ILavRvef1mdyAELhcFfUcg=
       skip_existing: true
+      skip_cleanup: true
       on:
-        tags: true
+        branch: master
     - provider: script
       script: bash scripts/deploy-docker.sh
+      skip_cleanup: true
       on:
-        tags: true
+        branch: master
