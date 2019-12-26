@@ -31,12 +31,12 @@ jobs:
     - nose2 -v --with-coverage --coverage-report xml
     - sonar-scanner
   - stage: release
+    if: branch = master
     python: 3.6
     install:
     - git config --global user.email "travis@travis-ci.org"
     - git config --global user.name "Travis CI"
-    - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/python-kacl.git
-      > /dev/null 2>&1
+    - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/python-kacl.git > /dev/null 2>&1
     - pip install bumpversion python-kacl
     script:
     - git checkout master
@@ -44,10 +44,8 @@ jobs:
     - kacl-cli release patch --tag --commit --commit-message "[skip ci] New version
       {latest_version} -> {new_version}" --modify
     - git push --tags --quiet --set-upstream github master
-    branches:
-      only:
-      - master
   - stage: deploy
+    if: tag IS present
     deploy:
     - provider: pypi
       user: __token__
