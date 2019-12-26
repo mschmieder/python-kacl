@@ -20,7 +20,7 @@ def prefixed_environ():
 
 @click.group(invoke_without_command=True)
 @click.option('-v', '--version', is_flag=True, required=False, help='Prints the current version of the CLI.')
-@click.option('-c', '--config', required=False, default='.kacl.conf', type=click.Path(exists=False), help='Path to kacl config file.', show_default=True)
+@click.option('-c', '--config', required=False, default=None, type=click.Path(exists=False), help='Path to kacl config file.', show_default=True)
 @click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file.', show_default=True)
 @click.pass_context
 def cli(ctx, version, config, file):
@@ -36,12 +36,16 @@ def cli(ctx, version, config, file):
                        f"{changelog_file} not found")
             sys.exit(1)
 
+        if config is None:
+            default_config_path = os.path.join(os.getcwd(), '.kacl.yml')
+            config = default_config_path if os.path.exists(default_config_path) else None
+
         kacl_config = kacl.KACLConfig(config)
         if file:
-            kacl_config.set_changelog_file(file)
+            kacl_config.set_changelog_file_path(file)
 
         # read the changelog
-        kacl_changelog = kacl.load(kacl_config.changelog_file())
+        kacl_changelog = kacl.load(kacl_config.changelog_file_path())
         kacl_changelog.set_config(kacl_config)
 
         # share the objects
