@@ -41,7 +41,7 @@ jobs:
     script:
     - git checkout master &&
       bumpversion patch &&
-      kacl-cli release patch --tag --commit --commit-message "[skip ci] New version {latest_version} -> {new_version}" --modify &&
+      kacl-cli release patch --tag --commit --commit-message "[ci skip] New version {latest_version} -> {new_version}" --modify &&
       git push --tags --quiet --set-upstream github master
   - stage: deploy
     if: tag IS present
