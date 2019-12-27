@@ -84,7 +84,7 @@ def get(ctx, version):
     """Returns a given version from the Changelog.
     """
     kacl_changelog = ctx.obj['changelog']
-    
+
     # add changes to changelog
     kacl_version = kacl_changelog.get(version)
 
