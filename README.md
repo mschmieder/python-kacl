@@ -17,6 +17,7 @@ A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**
   - [Print a single release changelog](#print-a-single-release-changelog)
   - [Add an entry to an unreleased section](#add-an-entry-to-an-unreleased-section)
   - [Prepare a Changelog for a Release](#prepare-a-changelog-for-a-release)
+  - [Config file](#config-file)
 
 ## Installation
 
@@ -232,12 +233,18 @@ Options:
   --help                  Show this message and exit.
 ```
 
+**Git Support**
+
+`kacl-cli` provides a direct integration into your git repository. When releasing you often want to directly commit and tag the changes you did.
+Using the `release` command you can simply add the `--commit/--tag` option(s) that will add the changes made by the tool to git. These flags only take effect if you also provide
+the `--modify` option, otherwise no change will happen to your file system. By specifying `--commit-message` and `--tag-description` you can also decide what kind of information you
+want to see within the commit. Have a look at the _config_ section that shows more options to use along with the `release` command.
+
 **Messages (--commit-message, --tag-name, --tag-description)**
 
 This is templated using the Python Format String Syntax. Available in the template context are `latest_version` and `new_version` as well as all `environment variables` (prefixed with \$).
 You can also use the variables `now` or `utcnow` to get a current timestamp. Both accept datetime formatting (when used like as in `{now:%d.%m.%Y}`).
 Also available as --message (e.g.: kacl-cli release patch --commit --commit--message '[{now:%Y-%m-%d}] Jenkins Build {$BUILD_NUMBER}: {new_version}')
-
 
 **Usage with fixed version**
 
@@ -319,4 +326,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - initial release
 
 [Unreleased]: https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD
+```
+
+## Config file
+
+`kacl-cli` will automatically check if there is a `.kacl.yml` present within your execution directory. Within this configuration file you can set options to improve
+specifically CI workflows. It also allows you to better customize the validation behaviour of the system by allowing to define _custom header titles_, _allowed_version_sections_ as well as the
+required _default content_.
+
+By specifiying a `.kacl.yml` with any of those options, the _default config_ will be merged with those local changes. Most options are also available on the CLI which take precedence over the ones
+within the config files.
+
+**Default Config**
+
+```yaml
+kacl:
+  changelog_file: CHANGELOG.md
+  allowed_header_titles:
+    - Changelog
+    - Change Log
+  allowed_version_sections:
+    - Added
+    - Changed
+    - Deprecated
+    - Removed
+    - Fixed
+    - Security
+  default_content:
+    - All notable changes to this project will be documented in this file.
+    - The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+  git:
+    commit: True
+    commit_message: "[skip ci] Releasing Changelog version {new_version}"
+    commit_additional_files: []
+    tag: False
+    tag_name: "v{new_version}"
+    tag_description: "Version v{new_version} released"
 ```
