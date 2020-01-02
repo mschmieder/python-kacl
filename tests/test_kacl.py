@@ -179,3 +179,11 @@ class TestKacl(TestCase):
             changelog.release(increment = increment)
             self.assertEqual(expected_version, changelog.current_version())
 
+
+    def test_unreleased_missing_sections(self):
+        changlog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_missing_sections.md")
+
+        changelog = kacl.load(changlog_file)
+        validation = changelog.validate()
+        self.assertFalse(changelog.is_valid())

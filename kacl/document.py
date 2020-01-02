@@ -78,7 +78,7 @@ class KACLDocument:
                     end_character_pos=end_pos
                 )
 
-        # # 2. assert 'unreleased' version is available
+        # 2. assert 'unreleased' version is available
         # if self.get('Unreleased') == None:
         #     validation.add_error(
         #         line=None,
@@ -175,6 +175,13 @@ class KACLDocument:
                         line_number=element.line_number(),
                         error_message='Section does contain more than only listings.'
                     )
+        # 3.5 make sure that every version that has content has it's content in a section
+            if len(v.sections()) == 0 and len(v.body().strip()) != 0:
+                validation.add_error(
+                    line=v.raw(),
+                    line_number=v.line_number(),
+                    error_message=f'Version "{v.version()}" has change elements outside of a change section.'
+                )
 
         # 4 link references
         # 4.1 check that there are only linked references
