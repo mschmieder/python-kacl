@@ -29,7 +29,9 @@ setup(name='python-kacl',
           'click',
           'semver',
           'pychalk',
-          'gitpython'
+          'gitpython',
+          'pyyaml',
+          'python-box'
       ],
       zip_safe=False,
       classifiers= [
