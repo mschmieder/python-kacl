@@ -240,7 +240,7 @@ def release(ctx, version, modify, link, commit, commit_message, tag, tag_name, t
                            f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
 
             if commit or kacl_config.git_create_commit():
-                repo.git.add(kacl_config.changelog_file())
+                repo.git.add(kacl_config.changelog_file_path())
                 for f in kacl_config.git_commit_additional_files():
                     repo.git.add(f)
                 repo.git.commit('-m', commit_message.format(**vcs_context))
