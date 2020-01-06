@@ -1,7 +1,9 @@
 from unittest import TestCase
 
 import kacl
+from kacl.config import KACLConfig
 import os
+import yaml
 
 # from __future__ import print_function
 import chalk
@@ -187,3 +189,29 @@ class TestKacl(TestCase):
         changelog = kacl.load(changlog_file)
         validation = changelog.validate()
         self.assertFalse(changelog.is_valid())
+
+    def test_config(self):
+        config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/config.yml")
+        kacl_config = KACLConfig(config_file=config_file)
+
+        default_config = dict()
+        with open('kacl/config/kacl-default.yml', 'r') as f:
+            default_config = yaml.safe_load(f)['kacl']
+
+        # changes in config_file
+        # changelog_file: CHANGELOG.md
+        # allowed_header_titles:
+        #   - ChangeLog
+        # allowed_version_sections:
+        #   - Security
+        # git:
+        #   commit: False
+
+        self.assertNotEqual(kacl_config.allowed_header_titles(), default_config['allowed_header_titles'] )
+        self.assertEqual(kacl_config.allowed_header_titles(), ['ChangeLog'] )
+
+        self.assertNotEqual(kacl_config.allowed_version_sections(), default_config['allowed_version_sections'] )
+        self.assertEqual(kacl_config.allowed_version_sections(), ['Security'] )
+
+        self.assertNotEqual(kacl_config.git_create_commit, default_config['git']['commit'] )
+        self.assertEqual(kacl_config.git_create_commit(), False )

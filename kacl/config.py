@@ -9,7 +9,7 @@ class KACLConfig:
             self.__config = yaml.safe_load(df)
         if config_file:
             with open(os.path.expanduser(config_file), 'r') as f:
-                self.__config.update(yaml.safe_load(f))
+                KACLConfig.merge(self.__config, yaml.safe_load(f))
 
         self.__config = Box(self.__config)
 
@@ -45,3 +45,26 @@ class KACLConfig:
 
     def git_commit_additional_files(self):
         return self.__config.kacl.git.commit_additional_files
+
+    @staticmethod
+    def merge(a, b, path=None):
+        """ merge two dictionaries
+        :param a: dictionary the values will be merged into
+        :param b: dictionary the values will be used when overwriting values
+        :param path:
+        :return:
+        """
+        if path is None:
+            path = []
+        for key in b:
+            if key in a:
+                if isinstance(a[key], dict) and isinstance(b[key], dict):
+                    KACLConfig.merge(a[key], b[key], path + [str(key)])
+                elif a[key] == b[key]:
+                    pass  # same leaf value
+                else:
+                    a[key] = b[key]
+
+            else:
+                a[key] = b[key]
+        return a

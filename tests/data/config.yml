@@ -1,0 +1,8 @@
+kacl:
+  changelog_file: CHANGELOG.md
+  allowed_header_titles:
+    - ChangeLog
+  allowed_version_sections:
+    - Security
+  git:
+    commit: False
