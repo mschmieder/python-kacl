@@ -13,10 +13,33 @@ import traceback
 import git
 from datetime import datetime
 
+def load_changelog(ctx):
+    config = ctx.obj['config']
+    file = ctx.obj['file']
+
+    changelog_file = os.path.join(os.getcwd(), file)
+    if not os.path.exists(changelog_file):
+        click.echo(click.style("Error: ", fg='red') +
+                    f"{changelog_file} not found")
+        sys.exit(1)
+
+    if config is None:
+        default_config_path = os.path.join(os.getcwd(), '.kacl.yml')
+        config = default_config_path if os.path.exists(default_config_path) else None
+
+    kacl_config = kacl.KACLConfig(config)
+    if file:
+        kacl_config.set_changelog_file_path(file)
+
+    # read the changelog
+    kacl_changelog = kacl.load(kacl_config.changelog_file_path())
+    kacl_changelog.set_config(kacl_config)
+
+    # share the objects
+    return (kacl_changelog, changelog_file)
 
 def prefixed_environ():
     return dict((("${}".format(key), value) for key, value in os.environ.items()))
-
 
 @click.group(invoke_without_command=True)
 @click.option('-v', '--version', is_flag=True, required=False, help='Prints the current version of the CLI.')
@@ -26,33 +49,14 @@ def prefixed_environ():
 def cli(ctx, version=None, config=None, file=None):
     if ctx.obj is None:
         ctx.obj = dict()
+
+    ctx.obj['config'] = config
+    ctx.obj['file'] = file
+
     # if --version was given, print version and exit directly
     if version:
         click.echo(kacl.__version__)
         sys.exit(0)
-
-    if ctx.invoked_subcommand != 'new':
-        changelog_file = os.path.join(os.getcwd(), file)
-        if not os.path.exists(changelog_file):
-            click.echo(click.style("Error: ", fg='red') +
-                       f"{changelog_file} not found")
-            sys.exit(1)
-
-        if config is None:
-            default_config_path = os.path.join(os.getcwd(), '.kacl.yml')
-            config = default_config_path if os.path.exists(default_config_path) else None
-
-        kacl_config = kacl.KACLConfig(config)
-        if file:
-            kacl_config.set_changelog_file_path(file)
-
-        # read the changelog
-        kacl_changelog = kacl.load(kacl_config.changelog_file_path())
-        kacl_changelog.set_config(kacl_config)
-
-        # share the objects
-        ctx.obj['changelog'] = kacl_changelog
-        ctx.obj['changelog_filepath'] = changelog_file
 
 
 @cli.command()
@@ -63,8 +67,7 @@ def cli(ctx, version=None, config=None, file=None):
 def add(ctx, section, message, modify):
     """Adds a given message to a specified unreleased section. Use '--modify' to directly modify the changelog file.
     """
-    kacl_changelog = ctx.obj['changelog']
-    kacl_changelog_filepath = ctx.obj['changelog_filepath']
+    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
 
     # add changes to changelog
     kacl_changelog.add(section=section, data=message)
@@ -83,7 +86,7 @@ def add(ctx, section, message, modify):
 def get(ctx, version):
     """Returns a given version from the Changelog.
     """
-    kacl_changelog = ctx.obj['changelog']
+    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
 
     # add changes to changelog
     kacl_version = kacl_changelog.get(version)
@@ -105,8 +108,8 @@ def verify(ctx, as_json):
     Use '--json' get JSON formatted output that can be easier integrated into CI workflows.
     Exit code is the number of identified errors.
     """
-    kacl_changelog = ctx.obj['changelog']
-    kacl_changelog_filepath = os.path.basename(ctx.obj['changelog_filepath'])
+    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+    kacl_changelog_filepath = os.path.basename(kacl_changelog_filepath)
 
     valid = kacl_changelog.is_valid()
     validation = kacl_changelog.validate()
@@ -170,9 +173,8 @@ def release(ctx, version, modify, link, commit, commit_message, tag, tag_name, t
 
         kacl-cli release major|minor|patch
     """
-    kacl_changelog = ctx.obj['changelog']
+    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
     kacl_config = kacl_changelog.config()
-    kacl_changelog_filepath = ctx.obj['changelog_filepath']
 
     # check if the version string indicates automatic increment
     increment = None
