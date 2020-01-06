@@ -24,6 +24,7 @@ setup(name='python-kacl',
       },
       license='MIT',
       packages=['kacl'],
+      include_package_data=True,
       python_requires='>=3.6',
       install_requires=[
           'click',

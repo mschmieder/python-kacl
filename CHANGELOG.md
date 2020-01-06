@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Fixed
+- fixed bug where default config was not copied into the sdist package
 - fixed issue where help could not be retrieved for commands if no valid CHANGELOG file was given
 
 ## 0.2.13 - 2020-01-05
