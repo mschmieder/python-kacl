@@ -8,6 +8,9 @@ from .parser import KACLParser
 from .config import KACLConfig
 from.validation import KACLValidation
 
+WINDOWS_LINE_ENDING = r'\r\n'
+UNIX_LINE_ENDING = r'\n'
+
 class KACLDocument:
     def __init__(self, data="", headers=[], versions=[], link_references=None, config=KACLConfig()):
         self.__data = data
@@ -181,6 +184,16 @@ class KACLDocument:
                     line=v.raw(),
                     line_number=v.line_number(),
                     error_message=f'Version "{v.version()}" has change elements outside of a change section.'
+                )
+
+        # 3.6 Check that a link exists for linked versions
+            if '[' in v.raw() and ']' in v.raw() and not v.has_link_reference():
+                validation.add_error(
+                    line=v.raw(),
+                    line_number=v.line_number(),
+                    error_message=f'Version "{v.version()}" is linked, but no link reference found in changelog file.',
+                    start_character_pos=v.raw().find('['),
+                    end_character_pos=v.raw().find(']')
                 )
 
         # 4 link references
@@ -371,13 +384,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
         Returns:
             [KACLDocument] -- object holding all information
         """
-        # First check if there are link references and split the document where they begin
-        link_reference_begin, link_references = KACLParser.parse_link_references(
-            data)
 
-        changelog_body = data
+        data_lf = data.replace(WINDOWS_LINE_ENDING, UNIX_LINE_ENDING)
+
+        # First check if there are link references and split the document where they begin
+        link_reference_begin, link_references = KACLParser.parse_link_references(data_lf)
+
+        changelog_body = data_lf
         if link_reference_begin:
-            changelog_body = data[:link_reference_begin]
+            changelog_body = data_lf[:link_reference_begin]
 
         # read header
         headers = KACLParser.parse_header(changelog_body, 1, 2)
