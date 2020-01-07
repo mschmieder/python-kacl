@@ -12,7 +12,7 @@ import chalk
 class TestKacl(TestCase):
     def test_load_valid(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
         changelog = kacl.load(changlog_file)
 
         self.assertEqual(changelog.title(), 'Changelog')
@@ -29,7 +29,7 @@ class TestKacl(TestCase):
 
     def test_dump(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
         changelog = kacl.load(changlog_file)
         changelog_dump = kacl.dump(changelog)
         self.assertIsNotNone(changelog_dump)
@@ -47,7 +47,7 @@ class TestKacl(TestCase):
 
     def test_add_change(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
 
         changelog = kacl.load(changlog_file)
 
@@ -75,7 +75,7 @@ class TestKacl(TestCase):
 
     def test_release(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
         changelog = kacl.load(changlog_file)
 
         self.assertFalse(changelog.has_changes())
@@ -100,15 +100,21 @@ class TestKacl(TestCase):
 
 
     def test_invalid(self):
-        filename='CHANGELOG_1_1_0_invalid.md'
-        changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data", filename)
-        changelog = kacl.load(changlog_file)
-        self.assertFalse(changelog.is_valid())
+        invalid_files = [
+            'CHANGELOG_invalid.md',
+            'CHANGELOG_missing_sections.md',
+            'CHANGELOG_no_unreleased.md'
+        ]
+
+        for filename in invalid_files:
+            changlog_file = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)), "data", filename)
+            changelog = kacl.load(changlog_file)
+            self.assertFalse(changelog.is_valid())
 
     def test_valid(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
         changelog = kacl.load(changlog_file)
         self.assertTrue(changelog.is_valid())
 
@@ -130,7 +136,7 @@ class TestKacl(TestCase):
 
     def test_release_existing_version(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
         changelog = kacl.load(changlog_file)
 
         msg = 'This is my first added change'
@@ -141,7 +147,7 @@ class TestKacl(TestCase):
 
     def test_release_without_older_version(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
         changelog = kacl.load(changlog_file)
 
         msg = 'This is my first added change'
@@ -150,9 +156,9 @@ class TestKacl(TestCase):
         self.assertTrue(changelog.has_changes())
         self.assertRaises(Exception, changelog.release, "0.9.0", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
 
-    def test_release_withnon_semver(self):
+    def test_release_with_non_semver(self):
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
         changelog = kacl.load(changlog_file)
 
         msg = 'This is my first added change'
@@ -169,7 +175,7 @@ class TestKacl(TestCase):
             "patch": "1.0.1"
         }
         changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG_1_1_0.md")
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
 
         for increment, expected_version in tests.items():
             changelog = kacl.load(changlog_file)

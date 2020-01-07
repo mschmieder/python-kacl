@@ -186,6 +186,16 @@ class KACLDocument:
                     error_message=f'Version "{v.version()}" has change elements outside of a change section.'
                 )
 
+        # 3.6 Check that a link exists for linked versions
+            if '[' in v.raw() and ']' in v.raw() and not v.has_link_reference():
+                validation.add_error(
+                    line=v.raw(),
+                    line_number=v.line_number(),
+                    error_message=f'Version "{v.version()}" is linked, but no link reference found in changelog file.',
+                    start_character_pos=v.raw().find('['),
+                    end_character_pos=v.raw().find(']')
+                )
+
         # 4 link references
         # 4.1 check that there are only linked references
         version_strings = [v.version() for v in versions]
