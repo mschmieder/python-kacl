@@ -256,7 +256,6 @@ class KACLDocument:
             version {[str]} -- semantic versioning string
             increment {[str]} -- use either 'patch', 'minor', or 'major' to automatically increment the last version
         """
-
         if increment:
             v = self.current_version()
             if v:
