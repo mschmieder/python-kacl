@@ -179,6 +179,7 @@ def release(ctx, version, modify, link, commit, commit_message, tag, tag_name, t
     if not kacl_changelog.is_valid():
         click.echo(click.style("Error: ", fg='red') +
                        f"Changelog is not valid. Run 'kacl-cli verify' for more information.")
+        sys.exit(1)
 
     # check if the version string indicates automatic increment
     increment = None
