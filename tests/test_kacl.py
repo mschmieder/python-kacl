@@ -221,3 +221,16 @@ class TestKacl(TestCase):
 
         self.assertNotEqual(kacl_config.git_create_commit, default_config['git']['commit'] )
         self.assertEqual(kacl_config.git_create_commit(), False )
+
+
+    def test_link_generation(self):
+        changlog_file = os.path.join(os.path.dirname(
+        os.path.realpath(__file__)), "data/CHANGELOG.md")
+
+        changelog = kacl.load(changlog_file)
+        changelog.generate_links()
+
+        changelog_dump = kacl.dump(changelog)
+        with open('out.md', 'w') as f:
+            f.write(changelog_dump)
+        f.close()

@@ -1,11 +1,14 @@
 import datetime
 import re
 import semver
+import os
+import git
 
 from .element import KACLElement
 from .version import KACLVersion
 from .parser import KACLParser
 from .config import KACLConfig
+from .link_provider import LinkProvider
 from.validation import KACLValidation
 
 WINDOWS_LINE_ENDING = r'\r\n'
@@ -330,6 +333,29 @@ class KACLDocument:
             if v.version().lower() != 'unreleased':
                 return v.version()
 
+    def generate_links(self, host_url=None, compare_versions_template=None, unreleased_changes_template=None, initial_version_template=None):
+        link_provider = self.__get_link_provider(host_url=host_url,
+                                                 compare_versions_template=compare_versions_template,
+                                                 unreleased_changes_template=unreleased_changes_template,
+                                                 initial_version_template=initial_version_template)
+
+        versions = self.versions()
+        if len(versions) > 0:
+            for i in range(len(versions)-1):
+                fargs = {
+                    "version": versions[i].version(),
+                    "previous_version": versions[i+1].version(),
+                    "latest_version": self.current_version()
+                }
+
+                if 'unreleased' in versions[i].version().lower():
+                    versions[i].set_link( link_provider.unreleased_changes(**fargs) )
+                else:
+                    versions[i].set_link( link_provider.compare_versions(**fargs) )
+
+            versions[-1].set_link( link_provider.initial_version(**fargs) )
+
+
     def header(self):
         """Gives access to the top level heading element
 
@@ -405,3 +431,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
             v.set_link(link_references.get(v.version(), None))
 
         return KACLDocument(data=data, headers=headers, versions=versions, link_references=link_references)
+
+
+    def __get_link_provider(self, host_url=None, compare_versions_template=None, unreleased_changes_template=None, initial_version_template=None):
+        host_url = host_url if host_url else self.__config.git_host_url()
+        compare_versions_template = compare_versions_template if compare_versions_template else self.__config.git_links_compare_versions_template()
+        unreleased_changes_template = unreleased_changes_template if unreleased_changes_template else self.__config.git_links_unreleased_changes_template()
+        initial_version_template = initial_version_template if initial_version_template else self.__config.git_links_initial_version_template()
+
+        if host_url is None:
+            repo = git.Repo(os.getcwd())
+            remote = repo.remote()
+            for url in remote.urls:
+                host_url = url
+                break
+
+        return LinkProvider(host_url=host_url,
+                            compare_versions_template=compare_versions_template,
+                            unreleased_changes_template=unreleased_changes_template,
+                            initial_version_template=initial_version_template)

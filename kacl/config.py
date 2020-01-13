@@ -46,6 +46,23 @@ class KACLConfig:
     def git_commit_additional_files(self):
         return self.__config.kacl.git.commit_additional_files
 
+    def git_host_url(self):
+        if 'host_url' in self.__config.kacl.git:
+            return self.__config.kacl.git.host_url
+
+    def git_links_compare_versions_template(self):
+        if 'compare_versions_template' in self.__config.kacl.git.links:
+            return self.__config.kacl.git.links.compare_versions_template
+
+    def git_links_unreleased_changes_template(self):
+        if 'unreleased_changes_template' in self.__config.kacl.git.links:
+            return self.__config.kacl.git.links.unreleased_changes_template
+
+    def git_links_initial_version_template(self):
+        if 'initial_version_template' in self.__config.kacl.git.links:
+            return self.__config.kacl.git.links.initial_version_template
+
+
     @staticmethod
     def merge(a, b, path=None):
         """ merge two dictionaries
