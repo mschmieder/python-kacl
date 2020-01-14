@@ -235,7 +235,10 @@ def release(ctx, version, modify, link, auto_link, commit, commit_message, tag, 
     # get the latest_version before the release
     latest_version = kacl_changelog.current_version()
 
-    # release changes
+    # check config to see if we need to autogenerate changes
+    if auto_link is False and kacl_config.link_auto_generate():
+        auto_link = True
+
     kacl_changelog.release(version=version, link=link, auto_link=auto_link, increment=increment)
 
     # get the new version

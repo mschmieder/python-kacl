@@ -20,3 +20,8 @@ kacl:
     tag: True
     tag_name: "v{new_version}"
     tag_description: "Version v{new_version} released"
+  links:
+    auto_generate: True
+    compare_versions_template: '{host}/compare/v{previous_version}...v{version}'
+    unreleased_changes_template: '{host}/compare/v{latest_version}...HEAD'
+    initial_version_template: '{host}/tree/v{version}'

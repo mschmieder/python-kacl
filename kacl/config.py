@@ -46,21 +46,25 @@ class KACLConfig:
     def git_commit_additional_files(self):
         return self.__config.kacl.git.commit_additional_files
 
-    def git_host_url(self):
-        if 'host_url' in self.__config.kacl.git:
-            return self.__config.kacl.git.host_url
+    def link_auto_generate(self):
+        if 'auto_generate' in self.__config.kacl.links:
+            return self.__config.kacl.links.auto_generate
 
-    def git_links_compare_versions_template(self):
-        if 'compare_versions_template' in self.__config.kacl.git.links:
-            return self.__config.kacl.git.links.compare_versions_template
+    def link_host_url(self):
+        if 'host_url' in self.__config.kacl.links:
+            return self.__config.kacl.links.host_url
 
-    def git_links_unreleased_changes_template(self):
-        if 'unreleased_changes_template' in self.__config.kacl.git.links:
-            return self.__config.kacl.git.links.unreleased_changes_template
+    def links_compare_versions_template(self):
+        if 'compare_versions_template' in self.__config.kacl.links:
+            return self.__config.kacl.links.compare_versions_template
 
-    def git_links_initial_version_template(self):
-        if 'initial_version_template' in self.__config.kacl.git.links:
-            return self.__config.kacl.git.links.initial_version_template
+    def links_unreleased_changes_template(self):
+        if 'unreleased_changes_template' in self.__config.kacl.links:
+            return self.__config.kacl.links.unreleased_changes_template
+
+    def links_initial_version_template(self):
+        if 'initial_version_template' in self.__config.kacl.links:
+            return self.__config.kacl.links.initial_version_template
 
 
     @staticmethod

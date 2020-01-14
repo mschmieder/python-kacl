@@ -434,10 +434,10 @@ kacl:
     tag: False
     tag_name: "v{new_version}"
     tag_description: "Version v{new_version} released"
-    links:
-        # The host url is optional and will be automatically determined using your the git repository
-        # host_url: https://github.com/mschmieder/kacl-cli
-        compare_versions_template: '{host}/compare/v{previous_version}...v{version}'
-        unreleased_changes_template: '{host}/tree/v{latest_version}...HEAD'
-        initial_version_template: '{host}/tree/v{version}'
+  links:
+      # The host url is optional and will be automatically determined using your the git repository
+      # host_url: https://github.com/mschmieder/kacl-cli
+      compare_versions_template: '{host}/compare/{previous_version}...{version}'
+      unreleased_changes_template: '{host}/compare/{latest_version}...master'
+      initial_version_template: '{host}/tree/{version}'
 ```

@@ -451,10 +451,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 
     def __get_link_provider(self, host_url=None, compare_versions_template=None, unreleased_changes_template=None, initial_version_template=None):
-        host_url = host_url if host_url else self.__config.git_host_url()
-        compare_versions_template = compare_versions_template if compare_versions_template else self.__config.git_links_compare_versions_template()
-        unreleased_changes_template = unreleased_changes_template if unreleased_changes_template else self.__config.git_links_unreleased_changes_template()
-        initial_version_template = initial_version_template if initial_version_template else self.__config.git_links_initial_version_template()
+        host_url = host_url if host_url else self.__config.link_host_url()
+        compare_versions_template = compare_versions_template if compare_versions_template else self.__config.links_compare_versions_template()
+        unreleased_changes_template = unreleased_changes_template if unreleased_changes_template else self.__config.links_unreleased_changes_template()
+        initial_version_template = initial_version_template if initial_version_template else self.__config.links_initial_version_template()
 
         if host_url is None:
             repo = git.Repo(os.getcwd())
