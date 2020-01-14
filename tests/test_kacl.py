@@ -230,7 +230,6 @@ class TestKacl(TestCase):
         changelog = kacl.load(changlog_file)
         changelog.generate_links()
 
-        changelog_dump = kacl.dump(changelog)
-        with open('out.md', 'w') as f:
-            f.write(changelog_dump)
-        f.close()
+        versions = changelog.versions()
+        for v in versions:
+            self.assertIsNotNone(v.link())
