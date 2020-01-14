@@ -17,6 +17,6 @@ kacl:
     commit: True
     commit_message: "[skip ci] Releasing Changelog version {new_version}"
     commit_additional_files: []
-    tag: False
+    tag: True
     tag_name: "v{new_version}"
     tag_description: "Version v{new_version} released"

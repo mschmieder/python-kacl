@@ -39,11 +39,10 @@ jobs:
     - git config --global user.name "Travis CI"
     - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/python-kacl.git
       > /dev/null 2>&1
-    - pip install bumpversion python-kacl
+    - pip install bumpversion
+    - pip install .
     script:
-    - git checkout master && bumpversion patch && kacl-cli release patch --tag --commit
-      --commit-message "[ci skip] New version {latest_version} -> {new_version}" --modify
-      && git push --tags --quiet --set-upstream github master
+    - git checkout master && bumpversion patch && kacl-cli release patch && git push --tags --quiet --set-upstream github master
     deploy:
     - provider: pypi
       user: __token__
