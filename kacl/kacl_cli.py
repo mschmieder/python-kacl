@@ -100,6 +100,37 @@ def get(ctx, version):
         sys.exit(1)
 
 
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def link(ctx):
+    """Lets you modify version links
+    """
+    pass
+
+@link.command()
+@click.pass_context
+@click.option('-m', '--modify', is_flag=True, help='This option will add the changes directly into changelog file.')
+@click.option('--host-url', required=False, default=None, type=str, help='Host url to the git service. (i.e https://github.com/mschmieder/python-kacl)', show_default=True)
+@click.option('--compare-versions-template', required=False, default=None, type=str, help='Template string for version comparison link.', show_default=True)
+@click.option('--unreleased-changes-template', required=False, default=None, type=str, help='Template string for unreleased changes link.', show_default=True)
+@click.option('--initial-version-template', required=False, default=None, type=str, help='Template string for initial version link.', show_default=True)
+def generate(ctx, modify, host_url, compare_versions_template, unreleased_changes_template, initial_version_template):
+    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+
+    kacl_changelog.generate_links(host_url=host_url,
+                                  compare_versions_template=compare_versions_template,
+                                  unreleased_changes_template=unreleased_changes_template,
+                                  initial_version_template=initial_version_template)
+
+    kacl_changelog_content = kacl.dump(kacl_changelog)
+    if modify:
+        with open(kacl_changelog_filepath, 'w') as f:
+            f.write(kacl_changelog_content)
+        f.close()
+    else:
+        click.echo(kacl_changelog_content)
+
+
 @cli.command()
 @click.pass_context
 @click.option('--json', 'as_json', is_flag=True, help='Print validation output as yaml.')
@@ -157,13 +188,14 @@ def verify(ctx, as_json):
 @click.argument('version', type=str)
 @click.option('-m', '--modify', is_flag=True, help='This option will add the changes directly into changelog file.')
 @click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with.', show_default=True)
+@click.option('-g', '--auto-link', is_flag=True, help='Will automatically create and update necessary links.')
 @click.option('-c', '--commit', is_flag=True, help='If passed this will create a git commit with the changed Changelog.')
 @click.option('--commit-message', required=False, default=None, type=str, help='The commit message to use when using --commit flag')
 @click.option('-t', '--tag', is_flag=True, help='If passed this will create a git tag for the newly released version.')
 @click.option('--tag-name', required=False, default=None, type=str, help='The tag name to use when using --tag flag')
 @click.option('--tag-description', required=False, default=None, type=str, help='The tag description text to use when using --tag flag')
 @click.option('-d', '--allow-dirty', is_flag=True, help='If passed this will allow to commit/tag even on a "dirty".')
-def release(ctx, version, modify, link, commit, commit_message, tag, tag_name, tag_description, allow_dirty):
+def release(ctx, version, modify, link, auto_link, commit, commit_message, tag, tag_name, tag_description, allow_dirty):
     """Creates a release for the latest 'unreleased' changes. Use '--modify' to directly modify the changelog file.
     You can automatically use the latest version by using the version keywords 'major', 'minor', 'patch'
 
@@ -204,7 +236,7 @@ def release(ctx, version, modify, link, commit, commit_message, tag, tag_name, t
     latest_version = kacl_changelog.current_version()
 
     # release changes
-    kacl_changelog.release(version=version, link=link, increment=increment)
+    kacl_changelog.release(version=version, link=link, auto_link=auto_link, increment=increment)
 
     # get the new version
     new_version = kacl_changelog.current_version()

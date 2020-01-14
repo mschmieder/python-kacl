@@ -21,6 +21,6 @@ kacl:
     tag_name: "v{new_version}"
     tag_description: "Version v{new_version} released"
     links:
-      compare_versions_template: '{host}/compare/{previous_version}...{version}'
-      unreleased_changes_template: '{host}/tree/{latest_version}...HEAD'
-      initial_version_template: '{host}/tree/{version}'
+      compare_versions_template: '{host}/compare/v{previous_version}...v{version}'
+      unreleased_changes_template: '{host}/tree/v{latest_version}...HEAD'
+      initial_version_template: '{host}/tree/v{version}'

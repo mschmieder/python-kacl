@@ -17,6 +17,7 @@ A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**
   - [Print a single release changelog](#print-a-single-release-changelog)
   - [Add an entry to an unreleased section](#add-an-entry-to-an-unreleased-section)
   - [Prepare a Changelog for a Release](#prepare-a-changelog-for-a-release)
+  - [Link Generation](#link-generation)
   - [Config file](#config-file)
 
 ## Installation
@@ -220,6 +221,8 @@ Options:
   -m, --modify            This option will add the changes directly into
                           changelog file.
   -l, --link TEXT         A url that the version will be linked with.
+  -g, --auto-link         Will automatically create and update necessary
+                          links.
   -c, --commit            If passed this will create a git commit with the
                           changed Changelog.
   --commit-message TEXT   The commit message to use when using --commit flag
@@ -245,6 +248,36 @@ want to see within the commit. Have a look at the _config_ section that shows mo
 This is templated using the Python Format String Syntax. Available in the template context are `latest_version` and `new_version` as well as all `environment variables` (prefixed with \$).
 You can also use the variables `now` or `utcnow` to get a current timestamp. Both accept datetime formatting (when used like as in `{now:%d.%m.%Y}`).
 Also available as --message (e.g.: kacl-cli release patch --commit --commit--message '[{now:%Y-%m-%d}] Jenkins Build {$BUILD_NUMBER}: {new_version}')
+
+**Auto Link Generation**
+
+`kacl-cli` can automatically generate links for every version for you. Using the `--auto-link` option will generate _version comparison_ links for you. The link generation can be configured using the _config_ file. See the config section for more details
+
+```bash
+kacl-cli release 1.0.0 --auto-link
+```
+
+Example output:
+
+```markdown
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.0.0] - 2020-01-14
+### Added
+- `release` command will make sure changelog is valid before doing any changes.
+
+## 0.2.16 - 2020-01-07
+### Fixed
+- fixed issue #3 that did not detect linked versions with missing links
+
+[Unreleased]: https://github.com/mschmieder/python-kacl/tree/v1.0.0...HEAD
+[1.0.0]: https://github.com/mschmieder/python-kacl/compare/v0.2.16...v1.0.0
+```
 
 **Usage with fixed version**
 
@@ -328,6 +361,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 [Unreleased]: https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD
 ```
 
+## Link Generation
+
+`kacl-cli` let's you easily generate links to your versions. You can automatically generate all links following the desired patterns using `kacl-cli link generate`.
+The link generation can also be easily included into the `release` command and will take care of updating the `unreleased` and `latest_version` section.
+
+```bash
+Usage: kacl-cli link generate [OPTIONS]
+
+Options:
+  -m, --modify                    This option will add the changes directly
+                                  into changelog file.
+  --host-url TEXT                 Host url to the git service. (i.e
+                                  https://github.com/mschmieder/python-kacl)
+  --compare-versions-template TEXT
+                                  Template string for version comparison link.
+  --unreleased-changes-template TEXT
+                                  Template string for unreleased changes link.
+  --initial-version-template TEXT
+                                  Template string for initial version link.
+  --help                          Show this message and exit.
+```
+
+**Url Templating**
+
+in order to generate the correct urls, `python-kacl` allows you to define three templates `compare-versions-template`, `unreleased-changes-template` and `initial-version-template` that can be used to tell the system how to generate proper links. The easiest way to provide this information is to pass it to the `.kacl.yml` config file
+
+```yaml
+kacl:
+  git:
+    links:
+        # The host url is optional and will be automatically determined using your the git repository
+        host_url: https://github.com/mschmieder/kacl-cli
+        compare_versions_template: '{host}/compare/v{previous_version}...v{version}'
+        unreleased_changes_template: '{host}/tree/v{latest_version}...HEAD'
+        initial_version_template: '{host}/tree/v{version}'
+```
+
+Using the python format syntax you can generate any links you want. The available replacement variables are `version`, `previous_version`, `host` and `latest_version`.
+
 ## Config file
 
 `kacl-cli` will automatically check if there is a `.kacl.yml` present within your execution directory. Within this configuration file you can set options to improve
@@ -362,4 +434,10 @@ kacl:
     tag: False
     tag_name: "v{new_version}"
     tag_description: "Version v{new_version} released"
+    links:
+        # The host url is optional and will be automatically determined using your the git repository
+        # host_url: https://github.com/mschmieder/kacl-cli
+        compare_versions_template: '{host}/compare/v{previous_version}...v{version}'
+        unreleased_changes_template: '{host}/tree/v{latest_version}...HEAD'
+        initial_version_template: '{host}/tree/v{version}'
 ```

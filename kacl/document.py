@@ -250,7 +250,7 @@ class KACLDocument:
             self.__versions.insert(0, unreleased_version)
         unreleased_version.add(section.capitalize(), data)
 
-    def release(self, version=None, link=None, increment=None):
+    def release(self, version=None, link=None, auto_link=False, increment=None):
         """Creates a new release version by copying the 'unreleased' changes into the
         new version
 
@@ -308,6 +308,19 @@ class KACLDocument:
                                               date=datetime.datetime.now().strftime("%Y-%m-%d"),
                                               sections=unreleased_version.sections()))
 
+        if auto_link:
+            link_provider = self.__get_link_provider()
+            for i in range(2):
+                fargs = {
+                    "version": self.__versions[i].version(),
+                    "previous_version": self.__versions[i+1].version(),
+                    "latest_version": version
+                }
+                if 'unreleased' in self.__versions[i].version().lower():
+                    self.__versions[i].set_link( link_provider.unreleased_changes(**fargs) )
+                else:
+                    self.__versions[i].set_link( link_provider.compare_versions(**fargs) )
+
     def get(self, version):
         """Returns the selected version
 
@@ -334,6 +347,10 @@ class KACLDocument:
                 return v.version()
 
     def generate_links(self, host_url=None, compare_versions_template=None, unreleased_changes_template=None, initial_version_template=None):
+        """automatically generates links for all versions
+
+        Returns: None
+        """
         link_provider = self.__get_link_provider(host_url=host_url,
                                                  compare_versions_template=compare_versions_template,
                                                  unreleased_changes_template=unreleased_changes_template,
