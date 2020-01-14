@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 ### Added
 - `release` command will make sure changelog is valid before doing any changes.
+- It is now possible to automatically generate links for versions using `kacl-cli link generate` or `kacl-cli release patch --auto-link`
 
 ## 0.2.16 - 2020-01-07
 ### Fixed
