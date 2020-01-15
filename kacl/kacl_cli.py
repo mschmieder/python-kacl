@@ -315,7 +315,7 @@ def start():
         sys.exit(e.code)
     except:
         click.secho(
-            'Unexpected error occured. Make sure your file is a valid Mardown file.', fg='red')
+            'Unexpected error occured. Make sure your file is a valid Markdown file.', fg='red')
         click.echo(traceback.format_exc())
         sys.exit(1)
 
