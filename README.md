@@ -440,4 +440,5 @@ kacl:
       compare_versions_template: '{host}/compare/{previous_version}...{version}'
       unreleased_changes_template: '{host}/compare/{latest_version}...master'
       initial_version_template: '{host}/tree/{version}'
+      auto_generate: True
 ```
