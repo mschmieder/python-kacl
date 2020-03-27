@@ -357,7 +357,7 @@ class KACLDocument:
                                                  initial_version_template=initial_version_template)
 
         versions = self.versions()
-        if len(versions) > 0:
+        if len(versions) > 1:
             for i in range(len(versions)-1):
                 fargs = {
                     "version": versions[i].version(),
@@ -369,8 +369,17 @@ class KACLDocument:
                     versions[i].set_link( link_provider.unreleased_changes(**fargs) )
                 else:
                     versions[i].set_link( link_provider.compare_versions(**fargs) )
-
             versions[-1].set_link( link_provider.initial_version(**fargs) )
+        elif len(versions) == 1:
+            fargs = {
+                "version": versions[0].version(),
+                "latest_version": self.current_version()
+            }
+
+            if 'unreleased' in versions[0].version().lower():
+                versions[0].set_link( link_provider.initial_version(version="master") )
+            else:
+                versions[0].set_link( link_provider.initial_version(**fargs) )
 
 
     def header(self):
