@@ -82,6 +82,17 @@ def add(ctx, section, message, modify):
 
 @cli.command()
 @click.pass_context
+def current(ctx):
+    """Returns the current version from the Changelog.
+    """
+    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+
+    current_version = kacl_changelog.current_version()
+    click.echo(current_version)
+
+
+@cli.command()
+@click.pass_context
 @click.argument('version', type=str)
 def get(ctx, version):
     """Returns a given version from the Changelog.
