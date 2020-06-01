@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 ### Added
 - added `auto_generate` option to `links` section in config
+### Fixed
+- Fixed #7 where link generation failed if no version was available
 
 ### Fixed
 - fixed issues with auto generation of links where unrelease template was wrong

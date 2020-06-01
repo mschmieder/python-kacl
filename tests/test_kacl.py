@@ -74,29 +74,33 @@ class TestKacl(TestCase):
 
 
     def test_release(self):
-        changlog_file = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "data/CHANGELOG.md")
-        changelog = kacl.load(changlog_file)
+        valid_files = [
+            'CHANGELOG.md',
+            'CHANGELOG_unrelease_only.md'
+        ]
 
-        self.assertFalse(changelog.has_changes())
+        for filename in valid_files:
+            changlog_file = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)), "data", filename)
+            changelog = kacl.load(changlog_file)
 
-        msg = 'This is my first added change'
-        changelog.add('Added', msg)
+            msg = 'This is my first added change'
+            changelog.add('Added', msg)
 
-        self.assertTrue(changelog.has_changes())
+            self.assertTrue(changelog.has_changes())
 
-        changelog.release(version='2.0.0', link='https://my-new-version/2.0.0.html')
+            changelog.release(version='2.0.0', link='https://my-new-version/2.0.0.html')
 
-        changelog_dump = kacl.dump(changelog)
-        self.assertIsNotNone(changelog_dump)
+            changelog_dump = kacl.dump(changelog)
+            self.assertIsNotNone(changelog_dump)
 
-        changelog_changed = kacl.parse(changelog_dump)
-        self.assertIsNotNone(changelog_changed)
+            changelog_changed = kacl.parse(changelog_dump)
+            self.assertIsNotNone(changelog_changed)
 
-        version = changelog_changed.get('2.0.0')
-        self.assertIsNotNone(version)
+            version = changelog_changed.get('2.0.0')
+            self.assertIsNotNone(version)
 
-        self.assertIn(msg, version.changes('Added').items())
+            self.assertIn(msg, version.changes('Added').items())
 
 
     def test_invalid(self):
@@ -224,12 +228,19 @@ class TestKacl(TestCase):
 
 
     def test_link_generation(self):
-        changlog_file = os.path.join(os.path.dirname(
-        os.path.realpath(__file__)), "data/CHANGELOG.md")
+        valid_files = [
+            #'CHANGELOG.md',
+            'CHANGELOG_unrelease_only.md'
+        ]
 
-        changelog = kacl.load(changlog_file)
-        changelog.generate_links()
+        for filename in valid_files:
+            changlog_file = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)), "data", filename)
+            changelog = kacl.load(changlog_file)
 
-        versions = changelog.versions()
-        for v in versions:
-            self.assertIsNotNone(v.link())
+            changelog = kacl.load(changlog_file)
+            changelog.generate_links()
+
+            versions = changelog.versions()
+            for v in versions:
+                self.assertIsNotNone(v.link())
