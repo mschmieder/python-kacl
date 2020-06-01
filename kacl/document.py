@@ -103,8 +103,8 @@ class KACLDocument:
                     regex = f'#\\s+\\[{KACLParser.semver_regex}\\]'
                     regex_error = r'#\s+\[(.*)\]'
                 if not KACLParser.parse_sem_ver(raw, regex):
-                    start_pos
-                    end_pos
+                    start_pos = 0
+                    end_pos = 0
                     m = re.match(regex_error, raw)
                     if m:
                         start_pos = raw.find(m.group(1))
