@@ -165,6 +165,18 @@ kacl-cli verify --json
 }
 ```
 
+## Print the current release version
+
+**Usage**
+
+```bash
+kacl-cli current
+```
+
+```
+0.1.2
+```
+
 ## Print a single release changelog
 
 **Usage**
