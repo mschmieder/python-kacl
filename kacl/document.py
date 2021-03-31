@@ -9,7 +9,8 @@ from .version import KACLVersion
 from .parser import KACLParser
 from .config import KACLConfig
 from .link_provider import LinkProvider
-from.validation import KACLValidation
+from .validation import KACLValidation
+from .exception import KACLException
 
 WINDOWS_LINE_ENDING = r'\r\n'
 UNIX_LINE_ENDING = r'\n'
@@ -271,18 +272,18 @@ class KACLDocument:
                     sv = sv.bump_major()
                 version = str(sv)
             else:
-                raise Exception("No previously released version found. Incrementing not possible")
+                raise KACLException("No previously released version found. Incrementing not possible")
 
         # check that version is a valid semantic version
         semver.parse(version) # --> will throw a ValueError if version is not a valid semver
 
         # check if there are changes to release
         if self.has_changes() is False:
-            raise Exception("The current changlog has no changes. You can only release if changes are available.")
+            raise KACLException("The current changlog has no changes. You can only release if changes are available.")
 
         # check if the version already exists
         if self.get(version) != None:
-            raise Exception(f"The version '{version}' already exists in the changelog. You cannot release the same version twice.")
+            raise KACLException(f"The version '{version}' already exists in the changelog. You cannot release the same version twice.")
 
         # check if new version is greater than the last one
         #   1. there has to be an 'unreleased' section
@@ -291,7 +292,7 @@ class KACLDocument:
         if len(version_list) > 1: # versions[0] --> unreleased
             last_version = version_list[1].version()
             if semver.compare(version, last_version) < 1:
-                raise Exception(f"The version '{version}' cannot be released since it is smaller than the preceeding version '{last_version}'.")
+                raise KACLException(f"The version '{version}' cannot be released since it is smaller than the preceeding version '{last_version}'.")
 
         # get current unreleased changes
         unreleased_version = self.get('Unreleased')
@@ -313,13 +314,20 @@ class KACLDocument:
             for i in range(2):
                 fargs = {
                     "version": self.__versions[i].version(),
-                    "previous_version": self.__versions[i+1].version(),
+                    "previous_version": None,
                     "latest_version": version
                 }
+
+                if len(self.__versions) > i+1:
+                    fargs["previous_version"] = self.__versions[i+1].version()
+
                 if 'unreleased' in self.__versions[i].version().lower():
                     self.__versions[i].set_link( link_provider.unreleased_changes(**fargs) )
                 else:
-                    self.__versions[i].set_link( link_provider.compare_versions(**fargs) )
+                    if fargs["previous_version"]:
+                        self.__versions[i].set_link( link_provider.compare_versions(**fargs) )
+                    else:
+                        self.__versions[i].set_link( link_provider.initial_version(**fargs) )
 
     def get(self, version):
         """Returns the selected version
@@ -466,11 +474,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
         initial_version_template = initial_version_template if initial_version_template else self.__config.links_initial_version_template()
 
         if host_url is None:
-            repo = git.Repo(os.getcwd())
-            remote = repo.remote()
-            for url in remote.urls:
-                host_url = url
-                break
+            try:
+                repo = git.Repo(os.getcwd())
+                remote = repo.remote()
+                for url in remote.urls:
+                    host_url = url
+                    break
+            except:
+                raise KACLException("ERROR: Could not determine project url. Update your config or run within a valid git repository")
 
         return LinkProvider(host_url=host_url,
                             compare_versions_template=compare_versions_template,

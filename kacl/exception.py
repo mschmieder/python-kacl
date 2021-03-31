@@ -1,0 +1,2 @@
+class KACLException(Exception):
+    pass

@@ -13,6 +13,8 @@ import traceback
 import git
 from datetime import datetime
 
+from kacl.exception import KACLException
+
 def load_changelog(ctx):
     config = ctx.obj['config']
     file = ctx.obj['file']
@@ -280,26 +282,27 @@ def release(ctx, version, modify, link, auto_link, commit, commit_message, tag, 
             tag_name        = tag_name if tag_name != None else kacl_config.git_tag_name()
             tag_description = tag_description if tag_description != None else kacl_config.git_tag_description()
 
+            repo = None
             try:
                 repo = git.Repo(os.getcwd())
             except git.InvalidGitRepositoryError:
                 click.echo(click.style("Error: ", fg='red') +
                            f'"{os.getcwd()}" is no valid git repository.')
 
-            if not repo.is_dirty() and not allow_dirty:
-                click.echo(click.style("Error: ", fg='red') +
-                           f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
+            if repo:
+                if not repo.is_dirty() and not allow_dirty:
+                    click.echo(click.style("Error: ", fg='red') +
+                            f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
 
-            if commit or kacl_config.git_create_commit():
-                repo.git.add(kacl_config.changelog_file_path())
-                for f in kacl_config.git_commit_additional_files():
-                    repo.git.add(f)
-                repo.git.commit('-m', commit_message.format(**vcs_context))
+                if commit or kacl_config.git_create_commit():
+                    repo.git.add(kacl_config.changelog_file_path())
+                    for f in kacl_config.git_commit_additional_files():
+                        repo.git.add(f)
+                    repo.git.commit('-m', commit_message.format(**vcs_context))
 
-            if tag or kacl_config.git_create_tag():
-                repo.create_tag(tag_name.format(**vcs_context),
-                                message=tag_description.format(**vcs_context))
-
+                if tag or kacl_config.git_create_tag():
+                    repo.create_tag(tag_name.format(**vcs_context),
+                                    message=tag_description.format(**vcs_context))
     else:
         click.echo(kacl_changelog_content)
 
@@ -324,12 +327,12 @@ def start():
         cli(obj={})
     except SystemExit as e:
         sys.exit(e.code)
+    except KACLException as e:
+        click.secho(str(e), fg='red')
+        sys.exit(1)
     except:
-        click.secho(
-            'Unexpected error occured. Make sure your file is a valid Mardown file.', fg='red')
         click.echo(traceback.format_exc())
         sys.exit(1)
-
 
 if __name__ == '__main__':
     start()
