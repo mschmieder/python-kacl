@@ -11,9 +11,9 @@ import chalk
 
 class TestKacl(TestCase):
     def test_load_valid(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
 
         self.assertEqual(changelog.title(), 'Changelog')
         self.assertGreater(len(changelog.versions()), 0)
@@ -28,13 +28,13 @@ class TestKacl(TestCase):
         self.assertIsNotNone(added_items)
 
     def test_dump(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
         changelog_dump = kacl.dump(changelog)
         self.assertIsNotNone(changelog_dump)
 
-        with open(changlog_file, 'r') as reference_file:
+        with open(changelog_file, 'r') as reference_file:
             changelog_reference = reference_file.read()
         reference_file.close()
 
@@ -46,10 +46,10 @@ class TestKacl(TestCase):
         self.assertEqual(changelog_dump, changelog_reference)
 
     def test_add_change(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
 
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
 
         msg = 'This is my first added change'
         changelog.add('Added', msg)
@@ -80,9 +80,9 @@ class TestKacl(TestCase):
         ]
 
         for filename in valid_files:
-            changlog_file = os.path.join(os.path.dirname(
+            changelog_file = os.path.join(os.path.dirname(
                 os.path.realpath(__file__)), "data", filename)
-            changelog = kacl.load(changlog_file)
+            changelog = kacl.load(changelog_file)
 
             msg = 'This is my first added change'
             changelog.add('Added', msg)
@@ -111,15 +111,15 @@ class TestKacl(TestCase):
         ]
 
         for filename in invalid_files:
-            changlog_file = os.path.join(os.path.dirname(
+            changelog_file = os.path.join(os.path.dirname(
                 os.path.realpath(__file__)), "data", filename)
-            changelog = kacl.load(changlog_file)
+            changelog = kacl.load(changelog_file)
             self.assertFalse(changelog.is_valid())
 
     def test_valid(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
         self.assertTrue(changelog.is_valid())
 
         validation = changelog.validate()
@@ -130,18 +130,18 @@ class TestKacl(TestCase):
         self.assertFalse(changelog.is_valid())
 
     def test_release_without_changes(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG_no_unreleased.md")
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
 
         self.assertFalse(changelog.has_changes())
         self.assertRaises(Exception, changelog.release, "1.1.1", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
 
 
     def test_release_existing_version(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
 
         msg = 'This is my first added change'
         changelog.add('Added', msg)
@@ -150,9 +150,9 @@ class TestKacl(TestCase):
         self.assertRaises(Exception, changelog.release, "1.0.0", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
 
     def test_release_without_older_version(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
 
         msg = 'This is my first added change'
         changelog.add('Added', msg)
@@ -161,9 +161,9 @@ class TestKacl(TestCase):
         self.assertRaises(Exception, changelog.release, "0.9.0", 'https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD' )
 
     def test_release_with_non_semver(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
 
         msg = 'This is my first added change'
         changelog.add('Added', msg)
@@ -178,11 +178,11 @@ class TestKacl(TestCase):
             "minor": "1.1.0",
             "patch": "1.0.1"
         }
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
 
         for increment, expected_version in tests.items():
-            changelog = kacl.load(changlog_file)
+            changelog = kacl.load(changelog_file)
 
             msg = 'This is my first added change'
             changelog.add('Added', msg)
@@ -193,10 +193,10 @@ class TestKacl(TestCase):
 
 
     def test_unreleased_missing_sections(self):
-        changlog_file = os.path.join(os.path.dirname(
+        changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG_missing_sections.md")
 
-        changelog = kacl.load(changlog_file)
+        changelog = kacl.load(changelog_file)
         validation = changelog.validate()
         self.assertFalse(changelog.is_valid())
 
@@ -234,11 +234,11 @@ class TestKacl(TestCase):
         ]
 
         for filename in valid_files:
-            changlog_file = os.path.join(os.path.dirname(
+            changelog_file = os.path.join(os.path.dirname(
                 os.path.realpath(__file__)), "data", filename)
-            changelog = kacl.load(changlog_file)
+            changelog = kacl.load(changelog_file)
 
-            changelog = kacl.load(changlog_file)
+            changelog = kacl.load(changelog_file)
             changelog.generate_links()
 
             versions = changelog.versions()
