@@ -127,7 +127,7 @@ Usage: kacl-cli verify [OPTIONS]
   Exit code is the number of identified errors.
 
 Options:
-  --json  Print validation output as yaml
+  --json  Print validation output as json
   --help  Show this message and exit.
 ```
 

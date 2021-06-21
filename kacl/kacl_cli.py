@@ -146,7 +146,7 @@ def generate(ctx, modify, host_url, compare_versions_template, unreleased_change
 
 @cli.command()
 @click.pass_context
-@click.option('--json', 'as_json', is_flag=True, help='Print validation output as yaml.')
+@click.option('--json', 'as_json', is_flag=True, help='Print validation output as json.')
 def verify(ctx, as_json):
     """Veryfies if the changelog is in "keep-a-changelog" format.
     Use '--json' get JSON formatted output that can be easier integrated into CI workflows.
