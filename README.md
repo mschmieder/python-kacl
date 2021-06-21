@@ -82,9 +82,9 @@ Options:
 Commands:
   add      Adds a given message to a specified unreleased section.
   get      Returns a given version from the Changelog
-  new      Creates a new changlog.
+  new      Creates a new changelog.
   release  Creates a release for the latest 'unreleased' changes.
-  verify   Veryfies if the changelog is in "keep-a-changlog" format.
+  verify   Veryfies if the changelog is in "keep-a-changelog" format.
 ```
 
 
@@ -93,7 +93,7 @@ Commands:
 ```
 Usage: kacl-cli new [OPTIONS]
 
-  Creates a new changlog.
+  Creates a new changelog.
 
 Options:
   -o, --output-file PATH  File to write the created changelog to.
@@ -122,12 +122,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ```
 Usage: kacl-cli verify [OPTIONS]
 
-  Veryfies if the changelog is in "keep-a-changlog" format. Use '--json' get
+  Veryfies if the changelog is in "keep-a-changelog" format. Use '--json' get
   JSON formatted output that can be easier integrated into CI workflows.
   Exit code is the number of identified errors.
 
 Options:
-  --json  Print validation output as yaml
+  --json  Print validation output as json
   --help  Show this message and exit.
 ```
 

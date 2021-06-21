@@ -146,9 +146,9 @@ def generate(ctx, modify, host_url, compare_versions_template, unreleased_change
 
 @cli.command()
 @click.pass_context
-@click.option('--json', 'as_json', is_flag=True, help='Print validation output as yaml.')
+@click.option('--json', 'as_json', is_flag=True, help='Print validation output as json.')
 def verify(ctx, as_json):
-    """Veryfies if the changelog is in "keep-a-changlog" format.
+    """Veryfies if the changelog is in "keep-a-changelog" format.
     Use '--json' get JSON formatted output that can be easier integrated into CI workflows.
     Exit code is the number of identified errors.
     """
@@ -242,7 +242,7 @@ def release(ctx, version, modify, link, auto_link, commit, commit_message, tag, 
 
     if not kacl_changelog.has_changes():
         click.echo(click.style("Error: ", fg='red') +
-                   'The current changlog has no changes. You can only release if changes are available.')
+                   'The current changelog has no changes. You can only release if changes are available.')
         sys.exit(1)
 
     # get the latest_version before the release
@@ -310,7 +310,7 @@ def release(ctx, version, modify, link, auto_link, commit, commit_message, tag, 
 @cli.command()
 @click.option('-o', '--output-file', required=False, type=click.Path(exists=False), help='File to write the created changelog to.')
 def new(output_file):
-    """Creates a new changlog.
+    """Creates a new changelog.
     """
     kacl_changelog = kacl.new()
     kacl_changelog_content = kacl.dump(kacl_changelog)

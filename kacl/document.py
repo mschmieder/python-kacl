@@ -279,7 +279,7 @@ class KACLDocument:
 
         # check if there are changes to release
         if self.has_changes() is False:
-            raise KACLException("The current changlog has no changes. You can only release if changes are available.")
+            raise KACLException("The current changelog has no changes. You can only release if changes are available.")
 
         # check if the version already exists
         if self.get(version) != None:
