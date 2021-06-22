@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - added console command to get the latest version from the Changelog
 
 ### Fixed
+- Fixed typos
 - Fixed #7 where link generation failed if no version was available
 - fixed issues with auto generation of links where unrelease template was wrong
 - fixed config hierarchy
