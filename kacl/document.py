@@ -474,14 +474,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
         initial_version_template = initial_version_template if initial_version_template else self.__config.links_initial_version_template()
 
         if host_url is None:
-            try:
-                repo = git.Repo(os.getcwd())
-                remote = repo.remote()
-                for url in remote.urls:
-                    host_url = url
-                    break
-            except:
-                raise KACLException("ERROR: Could not determine project url. Update your config or run within a valid git repository")
+            if 'CI_PROJECT_URL' in os.environ:
+                host_url = os.environ['CI_PROJECT_URL']
+            else:
+                try:
+                    repo = git.Repo(os.getcwd())
+                    remote = repo.remote()
+                    for url in remote.urls:
+                        host_url = url
+                        break
+                except:
+                    raise KACLException("ERROR: Could not determine project url. Update your config or run within a valid git repository")
 
         return LinkProvider(host_url=host_url,
                             compare_versions_template=compare_versions_template,
