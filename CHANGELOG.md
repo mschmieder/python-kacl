@@ -5,8 +5,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Fixed
-
 ### Added
 - added `auto_generate` option to `links` section in config
 - added console command to get the latest version from the Changelog
