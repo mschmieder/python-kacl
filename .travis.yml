@@ -11,7 +11,6 @@ env:
   - secure: WWAw49GFNlyGv2DkMvRcpJjVhWGA/xvSszKK+BoEUET3W9u8tL5obdKCoXSXArITQ6RhNjxK5l+13dJqW/kN/GBzCxHyJThPz9z7B8j+Pe9nx1rEpirr12aHwLfs7iJbLKsAr9wKRYnv9Io/t/jyLByI6+YMI/sxW4gWDVnK4pBv2kkLsbD2SyNTj+jZZ1z0kv7Lk6yBhKBj8J+hvEEoBbVdNaZtEe3p4mgPnR3EDLSQn6k3Qc63/6aKbnzh9L4ls3qoS7I8NMi8atLRpSCOJHEcQMnYb5rqOHfe9Zngedkdk9fFLgTR55w/egovye+aHJLqT5LK1pvR2FMCBgnufudacczaXPWxLmh2FijcNwIkPZsI7/+heeAiwdVflxl4jkgQitmy4VRoo36mRHrXRK9ipk78umBikaXGMtUNncAZzG7gSyYyx+EAbLWuVoBjheXZfTs9bOUijRtlMvm//RMZqKfGHaK7za9mu3rUKFLOlrs+CI6OorFeffrZzxImcEUqOanZpbidgNNstpFULlM7jA+kgSUecHePTJRWLD1oAib0I9RJljBp8I98oFb4lQR/2f7e8X03OUrJXHt7z+VJ+OHexdGKMTteQ78jmRnKR2+38gFONBORQeiclkUuJtY31kft0NkYs8CATYiX8unzTcUH5zP/HmwCQ0Vo6GA=
   - secure: AXDsnt/0UhYBC2s5BpKbn3kcdUl3J3o46HXPL+vffXckzXUaDm5uzFd+Y/NXWLrTTLiFBlPdL/dYCdhWs8JMIezZNKTqlN7XY+0gU8mdzWrjwYGhvD3scEJEcnvUWPFrUTy+zDUwkKnU9DfIG/j0vXyEeVg0bPWrVnSQVyWVFLnLT5Omyjbb5QE57LtaF+OXf638FeQoGRNERoluGZQRE6J/rqIouvDENj4PHBWYWVzE7mRzWB61p0GoQB759UDplKxfyi13LhiPZXWcf3RWWOCUdltzLZKenIBcHD11WEcftYRLF1NHarCPfZCKMPRNecAFUpLlr+D+djfb0B6E+MGs+weDkia3k3VvEdFQLKPWt0oUeD9VTc/XQ81/KX90lol7wsAmmFbxa2DZBb0BI/yo5wfGRiDSafgjkhRqYhIfgjkiHlCOXCaGlFPfMTPBehh6jrQuouhgLxQBYG24n7giMR/wrNV2YHix8qyLIj7r78U3ffuud+Bq4uOyKkY3woss+Yw7S8i6Zk7Vg3kJcn00W6y54umr95p6rpWabtW2zDXT3pGSW0OomkA2GvKseVXWpf/t/vvU3iyNeiV2hBOm7nCAf1a/Xk45dUZLvddHPXG0aSnR/IYfrOp9Jv7W8Svd3Z0obfIl2qIMeV2DdTobuECRau5cNzAhdjn+kbE=
 python:
-- 3.6
 - 3.7
 - 3.8
 install:
@@ -33,7 +32,7 @@ jobs:
     - sonar-scanner
   - stage: release
     if: branch = master
-    python: 3.6
+    python: 3.7
     install:
     - git config --global user.email "travis@travis-ci.org"
     - git config --global user.name "Travis CI"
