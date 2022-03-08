@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- added `--no-commit` option
 
+## 0.2.23 - 2021-01-14
 ### Added
 - added `auto_generate` option to `links` section in config
 - added console command to get the latest version from the Changelog
@@ -15,7 +18,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - fixed issues with auto generation of links where unrelease template was wrong
 - fixed config hierarchy
 - If running on gitlab-ci and no host URL is configued the URL is derived from CI_PROJECT_URL
-
 
 ## 0.2.17 - 2020-01-14
 ### Added

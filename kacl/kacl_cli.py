@@ -203,12 +203,13 @@ def verify(ctx, as_json):
 @click.option('-l', '--link', required=False, default=None, type=str, help='A url that the version will be linked with.', show_default=True)
 @click.option('-g', '--auto-link', is_flag=True, help='Will automatically create and update necessary links.')
 @click.option('-c', '--commit', is_flag=True, help='If passed this will create a git commit with the changed Changelog.')
+@click.option('--no-commit', is_flag=True, help='This will disabled the commit option even if it is set in the config.')
 @click.option('--commit-message', required=False, default=None, type=str, help='The commit message to use when using --commit flag')
 @click.option('-t', '--tag', is_flag=True, help='If passed this will create a git tag for the newly released version.')
 @click.option('--tag-name', required=False, default=None, type=str, help='The tag name to use when using --tag flag')
 @click.option('--tag-description', required=False, default=None, type=str, help='The tag description text to use when using --tag flag')
 @click.option('-d', '--allow-dirty', is_flag=True, help='If passed this will allow to commit/tag even on a "dirty".')
-def release(ctx, version, modify, link, auto_link, commit, commit_message, tag, tag_name, tag_description, allow_dirty):
+def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_message, tag, tag_name, tag_description, allow_dirty):
     """Creates a release for the latest 'unreleased' changes. Use '--modify' to directly modify the changelog file.
     You can automatically use the latest version by using the version keywords 'major', 'minor', 'patch'
 
@@ -266,43 +267,44 @@ def release(ctx, version, modify, link, auto_link, commit, commit_message, tag, 
             f.write(kacl_changelog_content)
         f.close()
 
-        if commit or tag or kacl_config.git_create_commit() or kacl_config.git_create_tag():
-            vcs_context = {
-                "latest_version": latest_version,
-                "new_version": new_version,
-            }
-            time_context = {
-                'now': datetime.now(),
-                'utcnow': datetime.utcnow(),
-            }
-            vcs_context.update(time_context)
-            vcs_context.update(prefixed_environ())
+        if not no_commit:
+            if commit or tag or kacl_config.git_create_commit() or kacl_config.git_create_tag():
+                vcs_context = {
+                    "latest_version": latest_version,
+                    "new_version": new_version,
+                }
+                time_context = {
+                    'now': datetime.now(),
+                    'utcnow': datetime.utcnow(),
+                }
+                vcs_context.update(time_context)
+                vcs_context.update(prefixed_environ())
 
-            commit_message  = commit_message if commit_message != None else kacl_config.git_commit_message()
-            tag_name        = tag_name if tag_name != None else kacl_config.git_tag_name()
-            tag_description = tag_description if tag_description != None else kacl_config.git_tag_description()
+                commit_message  = commit_message if commit_message != None else kacl_config.git_commit_message()
+                tag_name        = tag_name if tag_name != None else kacl_config.git_tag_name()
+                tag_description = tag_description if tag_description != None else kacl_config.git_tag_description()
 
-            repo = None
-            try:
-                repo = git.Repo(os.getcwd())
-            except git.InvalidGitRepositoryError:
-                click.echo(click.style("Error: ", fg='red') +
-                           f'"{os.getcwd()}" is no valid git repository.')
-
-            if repo:
-                if not repo.is_dirty() and not allow_dirty:
+                repo = None
+                try:
+                    repo = git.Repo(os.getcwd())
+                except git.InvalidGitRepositoryError:
                     click.echo(click.style("Error: ", fg='red') +
-                            f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
+                            f'"{os.getcwd()}" is no valid git repository.')
 
-                if commit or kacl_config.git_create_commit():
-                    repo.git.add(kacl_config.changelog_file_path())
-                    for f in kacl_config.git_commit_additional_files():
-                        repo.git.add(f)
-                    repo.git.commit('-m', commit_message.format(**vcs_context))
+                if repo:
+                    if not repo.is_dirty() and not allow_dirty:
+                        click.echo(click.style("Error: ", fg='red') +
+                                f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
 
-                if tag or kacl_config.git_create_tag():
-                    repo.create_tag(tag_name.format(**vcs_context),
-                                    message=tag_description.format(**vcs_context))
+                    if commit or kacl_config.git_create_commit():
+                        repo.git.add(kacl_config.changelog_file_path())
+                        for f in kacl_config.git_commit_additional_files():
+                            repo.git.add(f)
+                        repo.git.commit('-m', commit_message.format(**vcs_context))
+
+                    if tag or kacl_config.git_create_tag():
+                        repo.create_tag(tag_name.format(**vcs_context),
+                                        message=tag_description.format(**vcs_context))
     else:
         click.echo(kacl_changelog_content)
 
