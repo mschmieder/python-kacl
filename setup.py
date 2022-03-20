@@ -13,7 +13,7 @@ version = re.search(r'^__version__\s*=\s*"(.*)"',
 
 setup(name='python-kacl',
       version=version,
-      description='Pyhton module and CLI tool for validating and modifying Changelogs in "keep-a-changelog" format"',
+      description='Python module and CLI tool for validating and modifying Changelogs in "keep-a-changelog" format"',
       long_description=long_description,
       long_description_content_type='text/markdown',
       url='http://github.com/mschmieder/python-kacl',
