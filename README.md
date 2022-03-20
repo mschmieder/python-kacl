@@ -418,7 +418,7 @@ Using the python format syntax you can generate any links you want. The availabl
 specifically CI workflows. It also allows you to better customize the validation behaviour of the system by allowing to define _custom header titles_, _allowed_version_sections_ as well as the
 required _default content_.
 
-By specifiying a `.kacl.yml` with any of those options, the _default config_ will be merged with those local changes. Most options are also available on the CLI which take precedence over the ones
+By specifying a `.kacl.yml` with any of those options, the _default config_ will be merged with those local changes. Most options are also available on the CLI which take precedence over the ones
 within the config files.
 
 **Default Config**
