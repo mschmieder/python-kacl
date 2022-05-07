@@ -1,0 +1,7 @@
+- id: kacl-verify
+  name: "verify kacl/changelog"
+  description: 'Veryfies if the changelog is in "keep-a-changelog" format.'
+  entry: kacl-cli verify
+  language: python
+  types: [python]
+  always_run: true
