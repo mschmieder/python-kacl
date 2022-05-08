@@ -73,7 +73,7 @@ class KACLDocument:
 
         # 1.2 assert default content is in the header section
         for default_line in self.__config.default_content():
-            if default_line not in self.header().body():
+            if default_line not in self.header().body().replace('\n', ''):
                 header = self.header()
                 start_pos = header.raw().find(header.title())
                 end_pos = start_pos+len(header.title())

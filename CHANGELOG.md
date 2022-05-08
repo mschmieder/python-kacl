@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - fixed issues with auto generation of links where unrelease template was wrong
 - fixed config hierarchy
 - If running on gitlab-ci and no host URL is configured the URL is derived from CI_PROJECT_URL
+- Fixed #17 where a single newlines was interpreted as a paragraph split, going against the markdown spec
 
 ## 0.2.17 - 2020-01-14
 ### Added
