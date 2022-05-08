@@ -14,6 +14,7 @@ python:
 - 3.7
 - 3.8
 install:
+- pip install --upgrade importlib_metadata
 - pip install .
 - pip install nose2 "nose2[coverage_plugin]"
 script: nose2 -v --with-coverage --coverage-report xml
@@ -39,6 +40,7 @@ jobs:
     - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/python-kacl.git
       > /dev/null 2>&1
     - pip install bumpversion
+    - pip install --upgrade importlib_metadata
     - pip install .
     script:
     - git checkout master && bumpversion patch && kacl-cli release patch && git push --tags --quiet --set-upstream github master
