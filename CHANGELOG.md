@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.24] - 2022-05-09
 ### Added
 - added `--no-commit` option
 - added `pre-commit` hook
@@ -83,4 +85,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - implemented basic cli with `new`, `get`, `release`, `verify`
 - added `--json` option to `verify` command
 
-[Unreleased]: https://github.com/mschmieder/python-kacl/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/mschmieder/python-kacl.git/compare/v0.2.24...HEAD
+[0.2.24]: https://github.com/mschmieder/python-kacl.git/compare/v0.2.23...v0.2.24
