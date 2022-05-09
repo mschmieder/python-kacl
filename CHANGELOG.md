@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [0.2.24] - 2022-05-09
+### Fixed
+- Fixed CI to user VERSION file
+
+## [0.2.29] - 2022-05-09
 ### Added
 - added `--no-commit` option
 - added `pre-commit` hook
