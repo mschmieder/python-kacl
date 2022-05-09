@@ -73,7 +73,7 @@ class KACLDocument:
 
         # 1.2 assert default content is in the header section
         for default_line in self.__config.default_content():
-            if default_line not in self.header().body().replace('\n', ''):
+            if default_line not in self.header().body().replace('\n', ' '):
                 header = self.header()
                 start_pos = header.raw().find(header.title())
                 end_pos = start_pos+len(header.title())
@@ -173,7 +173,7 @@ class KACLDocument:
                 # 3.4.1 bring everything into a single line
                 body = element.body()
                 body_clean = re.sub(r'\n\s+', '', body)
-                lines = body_clean.split('\n')
+                lines = body_clean.split('\n\n')
                 non_list_lines = [x for x in lines if not x.strip(
                 ).startswith('-') and len(x.strip()) > 0]
                 if len(non_list_lines) > 0:
