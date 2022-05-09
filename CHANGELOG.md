@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 ### Added
 - added `--no-commit` option
+- added `pre-commit` hook
+
+### Fixed
+- fixed handling of markdown newlines
 
 ## 0.2.23 - 2021-01-14
 ### Added

@@ -11,6 +11,7 @@ A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**
     - [From Source](#from-source)
     - [Pip Package](#pip-package)
     - [Docker](#docker)
+    - [pre-commit](#pre-commit)
   - [CLI](#cli)
   - [Create a Changelog](#create-a-changelog)
   - [Verify a Changelog](#verify-a-changelog)
@@ -67,6 +68,17 @@ The `kacl-cli` is defined as entrypoint. Therefore the image can be used like th
 
 ```bash
 docker -v $(pwd):$(pwd) -w $(pwd) mschmieder/kacl-cli:latest verify
+```
+
+### pre-commit
+
+The package can also be used as a pre-commit hook. Just add the following to your `.pre-commit-config.yaml`
+
+```yaml
+- repo: https://github.com/mschmieder/python-kacl
+  rev: 'v0.2.30'
+  hooks:
+    - id: kacl-verify
 ```
 
 ## CLI

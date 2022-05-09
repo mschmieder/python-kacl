@@ -125,6 +125,24 @@ class TestKacl(TestCase):
         validation = changelog.validate()
         self.assertGreaterEqual(len(validation.errors()), 0)
 
+    def test_valid_keepachangelogcom(self):
+        changelog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_keepachangelog.com.md")
+        changelog = kacl.load(changelog_file)
+        self.assertTrue(changelog.is_valid())
+
+        validation = changelog.validate()
+        self.assertGreaterEqual(len(validation.errors()), 0)
+
+    def test_valid_project_changelog(self):
+        changelog_file = os.path.join(os.path.dirname(os.path.dirname(
+            os.path.realpath(__file__))), "CHANGELOG.md")
+        changelog = kacl.load(changelog_file)
+        self.assertTrue(changelog.is_valid())
+
+        validation = changelog.validate()
+        self.assertGreaterEqual(len(validation.errors()), 0)
+
     def test_load_empty(self):
         changelog = kacl.parse("")
         self.assertFalse(changelog.is_valid())
