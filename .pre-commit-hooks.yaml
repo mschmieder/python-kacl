@@ -4,3 +4,4 @@
   entry: kacl-cli verify
   language: python
   files: '^CHANGELOG.md'
+  pass_filenames: false
