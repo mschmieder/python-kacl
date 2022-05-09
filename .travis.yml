@@ -43,7 +43,7 @@ jobs:
     - pip install --upgrade importlib_metadata
     - pip install .
     script:
-    - git checkout master && bumpversion patch && kacl-cli release patch && git push --tags --quiet --set-upstream github master
+    - git checkout master && bumpversion patch && kacl-cli release patch -m && git push --tags --quiet --set-upstream github master
     deploy:
     - provider: pypi
       user: __token__
