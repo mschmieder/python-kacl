@@ -46,7 +46,7 @@ def prefixed_environ():
 @click.group(invoke_without_command=True)
 @click.option('-v', '--version', is_flag=True, required=False, help='Prints the current version of the CLI.')
 @click.option('-c', '--config', required=False, default=None, type=click.Path(exists=False), help='Path to kacl config file.', show_default=True)
-@click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file.', show_default=True)
+@click.option('-f', '--file', required=False, default=None, type=str, help='Path to changelog file.', show_default=True)
 @click.pass_context
 def cli(ctx, version=None, config=None, file=None):
     if ctx.obj is None:

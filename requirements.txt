@@ -1,0 +1,6 @@
+click
+semver
+pychalk
+gitpython
+pyyaml
+python-box

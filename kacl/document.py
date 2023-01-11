@@ -123,7 +123,7 @@ class KACLDocument:
             try:
                 v0 = versions[i]
                 v1 = versions[i+1]
-                if semver.compare(v0.version(), v1.version()) < 1:
+                if semver.VersionInfo.compare(v0.version(), v1.version()) < 1:
                     validation.add_error(
                         line=v1.raw(),
                         line_number=v1.line_number(),
