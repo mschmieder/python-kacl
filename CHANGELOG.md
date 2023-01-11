@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - Fixed CI to use VERSION file
 
+### Changed
+- Changelogs will always have a newline at the end of a file after being dumped
+
 ## 0.2.29 - 2022-05-09
 ### Added
 - added `--no-commit` option
