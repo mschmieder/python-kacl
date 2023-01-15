@@ -264,7 +264,9 @@ class KACLDocument:
             v = self.current_version()
             if v:
                 sv = semver.VersionInfo.parse(v)
-                if 'patch' == increment:
+                if 'post' == increment:
+                    sv = sv.bump_prerelease(token='post')
+                elif 'patch' == increment:
                     sv = sv.bump_patch()
                 elif 'minor' == increment:
                     sv = sv.bump_minor()
@@ -290,8 +292,26 @@ class KACLDocument:
         #   2. All other versions are in descending order
         version_list = self.versions()
         if len(version_list) > 1: # versions[0] --> unreleased
-            last_version = version_list[1].version()
-            if future_version.compare(last_version) < 1:
+            last_version = semver.VersionInfo.parse(version_list[1].version())
+
+            last_version_base = semver.VersionInfo(major=last_version.major, minor=last_version.minor, patch=last_version.patch)
+            future_version_base = semver.VersionInfo(major=future_version.major, minor=future_version.minor, patch=future_version.patch)
+
+            comp_result = 0
+            #   2.1 Check if 'future version' is a 'post version'
+            if future_version.prerelease and 'post' in future_version.prerelease:
+            #   2.2 if 'last version' was a 'post version' continue
+                if last_version.prerelease and 'post' in last_version.prerelease:
+                    comp_result = future_version.compare(last_version)
+             #   2.3 if 'last version' was NOT a 'post version' ensure 'post version' has same 'base version'
+                elif future_version_base != last_version_base:
+                    comp_result = -1 # indicate error
+                else:
+                    comp_result = 1
+            else:
+                comp_result = future_version.compare(last_version)
+
+            if comp_result < 1:
                 raise KACLException(f"The version '{version}' cannot be released since it is smaller than the preceding version '{last_version}'.")
 
         # get current unreleased changes
