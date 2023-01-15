@@ -19,6 +19,10 @@ class KACLMarkdownSerializer:
                     link_references.append(self.__serialize_link_reference(version))
 
             data.extend(link_references)
+
+            if data[-1] != '':
+                data.append('')
+
             return '\n'.join(data)
         elif isinstance(document, KACLVersion):
             return self.__serialize_version(document)

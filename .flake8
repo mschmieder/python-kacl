@@ -1,0 +1,13 @@
+[flake8]
+per-file-ignores =
+    kacl/__init__.py:F401
+extend-ignore =
+    E501 # line-length
+exclude =
+    .tox,
+    .git,
+    */migrations/*,
+    */static/CACHE/*,
+    node_modules,
+    venv,
+    .venv

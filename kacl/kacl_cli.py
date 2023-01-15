@@ -5,7 +5,6 @@
 import sys
 import os
 import kacl
-import chalk
 import click
 import json
 import semver
@@ -19,34 +18,34 @@ def load_changelog(ctx):
     config = ctx.obj['config']
     file = ctx.obj['file']
 
-    changelog_file = os.path.join(os.getcwd(), file)
-    if not os.path.exists(changelog_file):
-        click.echo(click.style("Error: ", fg='red') +
-                    f"{changelog_file} not found")
-        sys.exit(1)
+    default_config_path = os.path.join(os.getcwd(), '.kacl.yml')
+    if not config and os.path.exists(default_config_path):
+        kacl_config = kacl.KACLConfig(default_config_path)
+    else:
+        kacl_config = kacl.KACLConfig()
 
-    if config is None:
-        default_config_path = os.path.join(os.getcwd(), '.kacl.yml')
-        config = default_config_path if os.path.exists(default_config_path) else None
-
-    kacl_config = kacl.KACLConfig(config)
     if file:
         kacl_config.set_changelog_file_path(file)
+
+    if not os.path.exists(kacl_config.changelog_file_path()):
+        click.echo(click.style("Error: ", fg='red') +
+                    f"{kacl_config.changelog_file_path()} not found")
+        sys.exit(1)
 
     # read the changelog
     kacl_changelog = kacl.load(kacl_config.changelog_file_path())
     kacl_changelog.set_config(kacl_config)
 
     # share the objects
-    return (kacl_changelog, changelog_file)
+    return kacl_changelog
 
 def prefixed_environ():
     return dict((("${}".format(key), value) for key, value in os.environ.items()))
 
 @click.group(invoke_without_command=True)
 @click.option('-v', '--version', is_flag=True, required=False, help='Prints the current version of the CLI.')
-@click.option('-c', '--config', required=False, default=None, type=click.Path(exists=False), help='Path to kacl config file.', show_default=True)
-@click.option('-f', '--file', required=False, default='CHANGELOG.md', type=click.Path(exists=False), help='Path to changelog file.', show_default=True)
+@click.option('-c', '--config', required=False, default=None, type=click.Path(exists=False, dir_okay=False, file_okay=True), help='Path to kacl config file.', show_default=True)
+@click.option('-f', '--file', required=False, default=None, type=click.Path(exists=True, dir_okay=False, file_okay=True), help='Path to changelog file.', show_default=True)
 @click.pass_context
 def cli(ctx, version=None, config=None, file=None):
     if ctx.obj is None:
@@ -69,13 +68,13 @@ def cli(ctx, version=None, config=None, file=None):
 def add(ctx, section, message, modify):
     """Adds a given message to a specified unreleased section. Use '--modify' to directly modify the changelog file.
     """
-    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+    kacl_changelog = load_changelog(ctx)
 
     # add changes to changelog
     kacl_changelog.add(section=section, data=message)
     kacl_changelog_content = kacl.dump(kacl_changelog)
     if modify:
-        with open(kacl_changelog_filepath, 'w') as f:
+        with open(kacl_changelog.config().changelog_file_path(), 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
     else:
@@ -87,7 +86,7 @@ def add(ctx, section, message, modify):
 def current(ctx):
     """Returns the current version from the Changelog.
     """
-    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+    kacl_changelog = load_changelog(ctx)
 
     current_version = kacl_changelog.current_version()
     click.echo(current_version)
@@ -99,7 +98,7 @@ def current(ctx):
 def get(ctx, version):
     """Returns a given version from the Changelog.
     """
-    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+    kacl_changelog = load_changelog(ctx)
 
     # add changes to changelog
     kacl_version = kacl_changelog.get(version)
@@ -128,7 +127,7 @@ def link(ctx):
 @click.option('--unreleased-changes-template', required=False, default=None, type=str, help='Template string for unreleased changes link.', show_default=True)
 @click.option('--initial-version-template', required=False, default=None, type=str, help='Template string for initial version link.', show_default=True)
 def generate(ctx, modify, host_url, compare_versions_template, unreleased_changes_template, initial_version_template):
-    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+    kacl_changelog = load_changelog(ctx)
 
     kacl_changelog.generate_links(host_url=host_url,
                                   compare_versions_template=compare_versions_template,
@@ -137,7 +136,7 @@ def generate(ctx, modify, host_url, compare_versions_template, unreleased_change
 
     kacl_changelog_content = kacl.dump(kacl_changelog)
     if modify:
-        with open(kacl_changelog_filepath, 'w') as f:
+        with open(kacl_changelog.config().changelog_file_path(), 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
     else:
@@ -152,8 +151,8 @@ def verify(ctx, as_json):
     Use '--json' get JSON formatted output that can be easier integrated into CI workflows.
     Exit code is the number of identified errors.
     """
-    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
-    kacl_changelog_filepath = os.path.basename(kacl_changelog_filepath)
+    kacl_changelog = load_changelog(ctx)
+    kacl_changelog_filepath = os.path.basename(kacl_changelog.config().changelog_file_path())
 
     valid = kacl_changelog.is_valid()
     validation = kacl_changelog.validate()
@@ -161,11 +160,6 @@ def verify(ctx, as_json):
         validation_map = validation.convert_to_dict()
         click.echo(json.dumps(validation_map, sort_keys=True, indent=4))
     else:
-        green = chalk.Chalk('green')
-        red = chalk.Chalk('red')
-        white = chalk.Chalk('white')
-        bold = chalk.bold
-
         for error in validation.errors():
             start_char_pos, end_char_pos = error.position()
 
@@ -173,20 +167,17 @@ def verify(ctx, as_json):
             if start_char_pos == None:
                 char_indicator = 0
 
-            click.echo(bold + kacl_changelog_filepath + ':' +
-                       f'{error.line_number()}:{char_indicator}: ' +
-                       red + 'error: ' +
-                       white + error.error_message() +
-                       chalk.RESET)
+            click.echo(click.style(
+                kacl_changelog_filepath + ':' +
+                f'{error.line_number()}:{char_indicator}: ' +
+                click.style('error: ', fg='red') +
+                error.error_message(), bold=True))
 
             if error.line():
                 click.echo(error.line())
                 if start_char_pos != None and end_char_pos != None:
                     mark_length = end_char_pos-start_char_pos-1
-                    click.echo(' '*start_char_pos +
-                               green + '^' +
-                               '~'*(mark_length) +
-                               chalk.RESET)
+                    click.echo(' '*start_char_pos + click.style('^' + '~'*(mark_length), fg="green"))
         if not valid:
             click.echo(f'{len(validation.errors())} error(s) generated.')
         else:
@@ -219,7 +210,7 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
 
         kacl-cli release major|minor|patch
     """
-    kacl_changelog, kacl_changelog_filepath = load_changelog(ctx)
+    kacl_changelog = load_changelog(ctx)
     kacl_config = kacl_changelog.config()
 
     if not kacl_changelog.is_valid():
@@ -263,7 +254,7 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
 
     # check if we should modify the file
     if modify:
-        with open(kacl_changelog_filepath, 'w') as f:
+        with open(kacl_changelog.config().changelog_file_path(), 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
 

@@ -3,12 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## Unreleased
 
 ### Fixed
-- Fixed CI to user VERSION file
+- Fixed CI to use VERSION file
+### Changed
+- removed `pychalk` dependency
 
-## [0.2.29] - 2022-05-09
+### Changed
+- Changelogs will always have a newline at the end of a file after being dumped
+
+## 0.2.29 - 2022-05-09
 ### Added
 - added `--no-commit` option
 - added `pre-commit` hook
@@ -87,6 +92,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - cli will now check for valid semantic version when using `release` command
 - implemented basic cli with `new`, `get`, `release`, `verify`
 - added `--json` option to `verify` command
-
-[Unreleased]: https://github.com/mschmieder/python-kacl.git/compare/v0.2.24...HEAD
-[0.2.24]: https://github.com/mschmieder/python-kacl.git/compare/v0.2.23...v0.2.24
