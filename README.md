@@ -15,11 +15,13 @@ A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**
   - [CLI](#cli)
   - [Create a Changelog](#create-a-changelog)
   - [Verify a Changelog](#verify-a-changelog)
+  - [Print the current release version](#print-the-current-release-version)
   - [Print a single release changelog](#print-a-single-release-changelog)
   - [Add an entry to an unreleased section](#add-an-entry-to-an-unreleased-section)
   - [Prepare a Changelog for a Release](#prepare-a-changelog-for-a-release)
   - [Link Generation](#link-generation)
   - [Config file](#config-file)
+  - [Development](#development)
 
 ## Installation
 
@@ -76,7 +78,7 @@ The package can also be used as a pre-commit hook. Just add the following to you
 
 ```yaml
 - repo: https://github.com/mschmieder/python-kacl
-  rev: 'v0.2.30'
+  rev: 'v0.3.0'
   hooks:
     - id: kacl-verify
 ```
@@ -233,7 +235,7 @@ Usage: kacl-cli release [OPTIONS] VERSION
 
   Creates a release for the latest 'unreleased' changes. Use '--modify' to
   directly modify the changelog file. You can automatically use the latest
-  version by using the version keywords 'major', 'minor', 'patch'
+  version by using the version keywords 'major', 'minor', 'patch', 'post'
 
   Example:
 
@@ -465,4 +467,30 @@ kacl:
       unreleased_changes_template: '{host}/compare/{latest_version}...master'
       initial_version_template: '{host}/tree/{version}'
       auto_generate: True
+```
+
+## Development
+
+With these instructions you can easily setup a development environment
+
+```bash
+# clone the project
+git clone https://github.com/mschmieder/python-kacl
+cd python-kacl
+
+# create a virtual env
+python3 -m venv .venv
+source ./venv/bin/activate
+
+# install in development mode
+pip install -e .
+
+# install development requirements
+pip install -r dev-requirements
+
+# run the tests
+python3 -m pytest --snapshot-update --allow-snapshot-deletion
+
+# open VSCode
+code .
 ```

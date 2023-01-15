@@ -5,9 +5,6 @@ from kacl.config import KACLConfig
 import os
 import yaml
 
-# from __future__ import print_function
-import chalk
-
 
 class TestKacl(TestCase):
     def test_load_valid(self):
@@ -194,10 +191,31 @@ class TestKacl(TestCase):
         tests = {
             "major": "2.0.0",
             "minor": "1.1.0",
-            "patch": "1.0.1"
+            "patch": "1.0.1",
+            "post": "1.0.0-post.1"
         }
         changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
+
+        for increment, expected_version in tests.items():
+            changelog = kacl.load(changelog_file)
+
+            msg = 'This is my first added change'
+            changelog.add('Added', msg)
+
+            self.assertTrue(changelog.has_changes())
+            changelog.release(increment = increment)
+            self.assertEqual(expected_version, changelog.current_version())
+
+    def test_post_release_with_increment(self):
+        tests = {
+            "major": "2.0.0",
+            "minor": "1.1.0",
+            "patch": "1.0.1",
+            "post": "1.0.0-post.2"
+        }
+        changelog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG_post.md")
 
         for increment, expected_version in tests.items():
             changelog = kacl.load(changelog_file)

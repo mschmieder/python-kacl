@@ -1,0 +1,7 @@
+black
+flake8
+pytest
+pytest-cov
+pytest-dotenv
+pytest-snapshot
+pytest-xdist

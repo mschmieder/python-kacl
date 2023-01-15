@@ -1,4 +1,7 @@
 from setuptools import setup
+import pathlib
+import pkg_resources
+from setuptools import find_packages
 from os import path
 import re
 
@@ -10,6 +13,11 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 version = re.search(r'^__version__\s*=\s*"(.*)"',
                     open('kacl/__init__.py').read(),
                     re.M).group(1)
+
+# read the requirements from requirements.txt
+requirements = []
+with pathlib.Path("requirements.txt").open() as requirements_txt:
+    requirements = [str(requirement) for requirement in pkg_resources.parse_requirements(requirements_txt)]
 
 setup(name='python-kacl',
       version=version,
@@ -23,17 +31,10 @@ setup(name='python-kacl',
            "console_scripts": ['kacl-cli = kacl.kacl_cli:start']
       },
       license='MIT',
-      packages=['kacl'],
+      packages=find_packages(),
       include_package_data=True,
       python_requires='>=3.6',
-      install_requires=[
-          'click',
-          'semver',
-          'pychalk',
-          'gitpython',
-          'pyyaml',
-          'python-box'
-      ],
+      install_requires=requirements,
       zip_safe=False,
       classifiers= [
           "License :: OSI Approved :: MIT License",
