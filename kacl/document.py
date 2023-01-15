@@ -291,7 +291,7 @@ class KACLDocument:
         version_list = self.versions()
         if len(version_list) > 1: # versions[0] --> unreleased
             last_version = version_list[1].version()
-            if semver.compare(version, last_version) < 1:
+            if semver.VersionInfo.compare(version, last_version) < 1:
                 raise KACLException(f"The version '{version}' cannot be released since it is smaller than the preceding version '{last_version}'.")
 
         # get current unreleased changes
