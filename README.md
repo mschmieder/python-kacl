@@ -78,7 +78,7 @@ The package can also be used as a pre-commit hook. Just add the following to you
 
 ```yaml
 - repo: https://github.com/mschmieder/python-kacl
-  rev: 'v0.2.30'
+  rev: 'v0.3.0'
   hooks:
     - id: kacl-verify
 ```
