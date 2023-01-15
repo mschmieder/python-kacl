@@ -13,11 +13,13 @@ env:
 python:
 - 3.7
 - 3.8
+- 3.9
+- 3.10
+- 3.11
 install:
-- pip install --upgrade importlib_metadata
+- pin install -r dev-requirements.txt
 - pip install .
-- pip install nose2 "nose2[coverage_plugin]"
-script: nose2 -v --with-coverage --coverage-report xml
+script: pytest
 jobs:
   include:
   - stage: docker
@@ -25,25 +27,24 @@ jobs:
     - docker
     script: docker build -t mschmieder/kacl-cli .
   - stage: analyse
-    python: 3.6
+    python: 3.9
     script:
     - git fetch --unshallow
-    - pip install nose2 "nose2[coverage_plugin]"
-    - nose2 -v --with-coverage --coverage-report xml
+    - pip install -r dev-requirements.txt
+    - pytest
     - sonar-scanner
   - stage: release
     if: branch = master
-    python: 3.7
+    python: 3.9
     install:
     - git config --global user.email "travis@travis-ci.org"
     - git config --global user.name "Travis CI"
     - git remote add github https://${GITHUB_TOKEN}@github.com/mschmieder/python-kacl.git
       > /dev/null 2>&1
     - pip install bumpversion
-    - pip install --upgrade importlib_metadata
     - pip install .
     script:
-    - git checkout master && bumpversion patch && kacl-cli release $(cat VERSION)using  -m && git push --tags --quiet --set-upstream github master
+    - git checkout master && bumpversion patch && kacl-cli release $(cat VERSION) -m && git push --tags --quiet --set-upstream github master
     deploy:
     - provider: pypi
       user: __token__
