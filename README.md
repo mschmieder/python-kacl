@@ -78,7 +78,7 @@ The package can also be used as a pre-commit hook. Just add the following to you
 
 ```yaml
 - repo: https://github.com/mschmieder/python-kacl
-  rev: 'v0.2.30'
+  rev: 'v0.3.0'
   hooks:
     - id: kacl-verify
 ```
@@ -235,7 +235,7 @@ Usage: kacl-cli release [OPTIONS] VERSION
 
   Creates a release for the latest 'unreleased' changes. Use '--modify' to
   directly modify the changelog file. You can automatically use the latest
-  version by using the version keywords 'major', 'minor', 'patch'
+  version by using the version keywords 'major', 'minor', 'patch', 'post'
 
   Example:
 

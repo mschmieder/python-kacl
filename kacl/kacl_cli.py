@@ -202,13 +202,13 @@ def verify(ctx, as_json):
 @click.option('-d', '--allow-dirty', is_flag=True, help='If passed this will allow to commit/tag even on a "dirty".')
 def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_message, tag, tag_name, tag_description, allow_dirty):
     """Creates a release for the latest 'unreleased' changes. Use '--modify' to directly modify the changelog file.
-    You can automatically use the latest version by using the version keywords 'major', 'minor', 'patch'
+    You can automatically use the latest version by using the version keywords 'major', 'minor', 'patch', 'post'
 
     Example:
 
         kacl-cli release 1.0.0
 
-        kacl-cli release major|minor|patch
+        kacl-cli release major|minor|patch|post
     """
     kacl_changelog = load_changelog(ctx)
     kacl_config = kacl_changelog.config()
@@ -220,7 +220,7 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
 
     # check if the version string indicates automatic increment
     increment = None
-    if version in ['major', 'minor', 'patch']:
+    if version in ['major', 'minor', 'patch', 'post']:
         increment = version
         version = None  # reset
     else:
