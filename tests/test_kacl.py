@@ -5,9 +5,6 @@ from kacl.config import KACLConfig
 import os
 import yaml
 
-# from __future__ import print_function
-import chalk
-
 
 class TestKacl(TestCase):
     def test_load_valid(self):

@@ -4,7 +4,7 @@ RUN apt update && apt-get install -y git
 
 COPY . /src
 
-RUN cd src && python /src/setup.py install \
+RUN cd src && pip install . \
     && rm -rf /src
 
 ENTRYPOINT [ "kacl-cli" ]
