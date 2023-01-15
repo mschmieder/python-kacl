@@ -14,10 +14,8 @@ python:
 - 3.7
 - 3.8
 - 3.9
-- 3.10
-- 3.11
 install:
-- pin install -r dev-requirements.txt
+- pip install -r dev-requirements.txt
 - pip install .
 script: pytest
 jobs:
