@@ -5,4 +5,4 @@ kacl:
   allowed_version_sections:
     - Security
   git:
-    commit: False
+    commit: True

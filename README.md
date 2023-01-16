@@ -20,6 +20,8 @@ A tool for verifying and modifying changelog in the [**K**eep-**A-C**hange-**L**
   - [Add an entry to an unreleased section](#add-an-entry-to-an-unreleased-section)
   - [Prepare a Changelog for a Release](#prepare-a-changelog-for-a-release)
   - [Link Generation](#link-generation)
+  - [Extensions](#extensions)
+    - [Post-release/Hotfix](#post-releasehotfix)
   - [Config file](#config-file)
   - [Development](#development)
 
@@ -426,6 +428,41 @@ kacl:
 
 Using the python format syntax you can generate any links you want. The available replacement variables are `version`, `previous_version`, `host` and `latest_version`.
 
+## Extensions
+
+### Post-release/Hotfix
+
+> **ATTENTION:** this is not SemVer compatible and not part of the KACL standard
+
+In some situations you might come across the challenge to patch a piece of software that is already in production and you _have to_ indicate that this is a `hotfix` release. `SemVer` is not meant to support this other than incrementing the `patch` version of your project, but it is not possible to release `1.0.1-hotfix.1` after `1.0.1` as `-hotfix.1` is considered a `prerelease` version and therefore is lower in order than the `1.0.1` version.
+
+To overcome this, `kacl` provides an `extension` to you can use in such corner cases
+
+You can enable the `post-release` extension by providing the `post_release_version_prefix` within the `extension` secion of your config file. By setting `post_release_version_prefix: hotfix` you can now easily release `hotfix` versions that are considered of higher order than the base version
+
+```yaml
+kacl:
+  extension:
+    post_release_version_prefix: hotfix
+```
+
+```bash
+
+# get current version
+kacl-cli current
+>> 0.3.1
+
+# add another change
+kacl-cli add Security "Security Hotfix" -m
+
+# release a hotfix version
+kacl-cli release post -m
+
+# get current version
+kacl-cli current
+>> 0.3.1-hotfix.1
+```
+
 ## Config file
 
 `kacl-cli` will automatically check if there is a `.kacl.yml` present within your execution directory. Within this configuration file you can set options to improve
@@ -467,6 +504,8 @@ kacl:
       unreleased_changes_template: '{host}/compare/{latest_version}...master'
       initial_version_template: '{host}/tree/{version}'
       auto_generate: True
+  extension:
+    post_release_version_prefix: null
 ```
 
 ## Development
