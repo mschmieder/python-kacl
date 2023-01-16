@@ -23,7 +23,7 @@ class KACLDocument:
         self.__link_references = link_references
         if not self.__link_references:
             self.__link_references = dict()
-        self.__config = config
+        self.config = config
 
     def validate(self):
         """Validates the current changelog and returns KACLValidation object containing all information
@@ -59,20 +59,20 @@ class KACLDocument:
                 )
 
         # 1.1 assert header title is in allowed list of header titles
-        if self.header().title() not in self.__config.allowed_header_titles():
+        if self.header().title() not in self.config.allowed_header_titles:
             header = self.header()
             start_pos = header.raw().find(header.title())
             end_pos = start_pos+len(header.title())
             validation.add_error(
                 line=header.raw(),
                 line_number=header.line_number(),
-                error_message=f"Header title not valid. Options are [{','.join(self.__config.allowed_header_titles())}]",
+                error_message=f"Header title not valid. Options are [{','.join(self.config.allowed_header_titles)}]",
                 start_character_pos=start_pos,
                 end_character_pos=end_pos
             )
 
         # 1.2 assert default content is in the header section
-        for default_line in self.__config.default_content():
+        for default_line in self.config.default_content:
             if default_line not in self.header().body().replace('\n', ' '):
                 header = self.header()
                 start_pos = header.raw().find(header.title())
@@ -159,13 +159,13 @@ class KACLDocument:
         # 3.3 check that only allowed sections are in the version
             sections = v.sections()
             for title, element in sections.items():
-                if title not in self.__config.allowed_version_sections():
+                if title not in self.config.allowed_version_sections:
                     start_pos = element.raw().find(title)
                     end_pos = start_pos+len(title)
                     validation.add_error(
                         line=element.raw(),
                         line_number=element.line_number(),
-                        error_message=f'"{title}" is not a valid section for a version. Options are [{",".join( self.__config.allowed_version_sections())}]',
+                        error_message=f'"{title}" is not a valid section for a version. Options are [{",".join( self.config.allowed_version_sections)}]',
                         start_character_pos=start_pos,
                         end_character_pos=end_pos
                     )
@@ -297,17 +297,22 @@ class KACLDocument:
             last_version_base = semver.VersionInfo(major=last_version.major, minor=last_version.minor, patch=last_version.patch)
             future_version_base = semver.VersionInfo(major=future_version.major, minor=future_version.minor, patch=future_version.patch)
 
+            # check if 'post_release_version_prefix' is set
+            post_release_version_prefix = self.config.post_release_version_prefix
             comp_result = 0
-            #   2.1 Check if 'future version' is a 'post version'
-            if future_version.prerelease and 'post' in future_version.prerelease:
-            #   2.2 if 'last version' was a 'post version' continue
-                if last_version.prerelease and 'post' in last_version.prerelease:
-                    comp_result = future_version.compare(last_version)
-             #   2.3 if 'last version' was NOT a 'post version' ensure 'post version' has same 'base version'
-                elif future_version_base != last_version_base:
-                    comp_result = -1 # indicate error
+            if post_release_version_prefix:
+                #   2.1 Check if 'future version' is a 'post version'
+                if future_version.prerelease and post_release_version_prefix in future_version.prerelease:
+                #   2.2 if 'last version' was a 'post version' continue
+                    if last_version.prerelease and post_release_version_prefix in last_version.prerelease:
+                        comp_result = future_version.compare(last_version)
+                #   2.3 if 'last version' was NOT a 'post version' ensure 'post version' has same 'base version'
+                    elif future_version_base != last_version_base:
+                        comp_result = -1 # indicate error
+                    else:
+                        comp_result = 1
                 else:
-                    comp_result = 1
+                    comp_result = future_version.compare(last_version)
             else:
                 comp_result = future_version.compare(last_version)
 
@@ -437,12 +442,6 @@ class KACLDocument:
         """
         return self.__versions
 
-    def set_config(self, config):
-        self.__config = config
-
-    def config(self):
-        return self.__config
-
     @staticmethod
     def init():
         return KACLDocument.parse("""# Changelog
@@ -488,10 +487,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 
     def __get_link_provider(self, host_url=None, compare_versions_template=None, unreleased_changes_template=None, initial_version_template=None):
-        host_url = host_url if host_url else self.__config.link_host_url()
-        compare_versions_template = compare_versions_template if compare_versions_template else self.__config.links_compare_versions_template()
-        unreleased_changes_template = unreleased_changes_template if unreleased_changes_template else self.__config.links_unreleased_changes_template()
-        initial_version_template = initial_version_template if initial_version_template else self.__config.links_initial_version_template()
+        host_url = host_url if host_url else self.config.link_host_url
+        compare_versions_template = compare_versions_template if compare_versions_template else self.config.links_compare_versions_template
+        unreleased_changes_template = unreleased_changes_template if unreleased_changes_template else self.config.links_unreleased_changes_template
+        initial_version_template = initial_version_template if initial_version_template else self.config.links_initial_version_template
 
         if host_url is None:
             if 'CI_PROJECT_URL' in os.environ:

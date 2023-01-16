@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- removed `python-box` dependency
+- `kacl-cli` won't enable the `post-release` feature on default
+- improved config system and python code maintainability
+### Added
+- added `post_release_version_prefix` config variable
+- added docs for `post-release` feature
+
 
 ## [0.3.1] - 2023-01-15
 ### Fixed

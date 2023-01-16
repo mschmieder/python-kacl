@@ -25,16 +25,16 @@ def load_changelog(ctx):
         kacl_config = kacl.KACLConfig()
 
     if file:
-        kacl_config.set_changelog_file_path(file)
+        kacl_config.changelog_file_path = file
 
-    if not os.path.exists(kacl_config.changelog_file_path()):
+    if not os.path.exists(kacl_config.changelog_file_path):
         click.echo(click.style("Error: ", fg='red') +
-                    f"{kacl_config.changelog_file_path()} not found")
+                    f"{kacl_config.changelog_file_path} not found")
         sys.exit(1)
 
     # read the changelog
-    kacl_changelog = kacl.load(kacl_config.changelog_file_path())
-    kacl_changelog.set_config(kacl_config)
+    kacl_changelog = kacl.load(kacl_config.changelog_file_path)
+    kacl_changelog.config = kacl_config
 
     # share the objects
     return kacl_changelog
@@ -74,7 +74,7 @@ def add(ctx, section, message, modify):
     kacl_changelog.add(section=section, data=message)
     kacl_changelog_content = kacl.dump(kacl_changelog)
     if modify:
-        with open(kacl_changelog.config().changelog_file_path(), 'w') as f:
+        with open(kacl_changelog.config.changelog_file_path, 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
     else:
@@ -136,7 +136,7 @@ def generate(ctx, modify, host_url, compare_versions_template, unreleased_change
 
     kacl_changelog_content = kacl.dump(kacl_changelog)
     if modify:
-        with open(kacl_changelog.config().changelog_file_path(), 'w') as f:
+        with open(kacl_changelog.config.changelog_file_path, 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
     else:
@@ -152,7 +152,7 @@ def verify(ctx, as_json):
     Exit code is the number of identified errors.
     """
     kacl_changelog = load_changelog(ctx)
-    kacl_changelog_filepath = os.path.basename(kacl_changelog.config().changelog_file_path())
+    kacl_changelog_filepath = os.path.basename(kacl_changelog.config.changelog_file_path)
 
     valid = kacl_changelog.is_valid()
     validation = kacl_changelog.validate()
@@ -211,7 +211,7 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
         kacl-cli release major|minor|patch|post
     """
     kacl_changelog = load_changelog(ctx)
-    kacl_config = kacl_changelog.config()
+    kacl_config = kacl_changelog.config
 
     if not kacl_changelog.is_valid():
         click.echo(click.style("Error: ", fg='red') +
@@ -226,7 +226,7 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
     else:
         # check if version is a valid semantic version
         try:
-            semver.parse(version)
+            semver.VersionInfo.parse(version)
         except:
             click.echo(click.style("Error: ", fg='red') +
                        f'"{version}" not a valid semantic version.')
@@ -241,7 +241,7 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
     latest_version = kacl_changelog.current_version()
 
     # check config to see if we need to autogenerate changes
-    if auto_link is False and kacl_config.link_auto_generate():
+    if auto_link is False and kacl_config.link_auto_generate:
         auto_link = True
 
     kacl_changelog.release(version=version, link=link, auto_link=auto_link, increment=increment)
@@ -254,12 +254,12 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
 
     # check if we should modify the file
     if modify:
-        with open(kacl_changelog.config().changelog_file_path(), 'w') as f:
+        with open(kacl_changelog.config.changelog_file_path, 'w') as f:
             f.write(kacl_changelog_content)
         f.close()
 
         if not no_commit:
-            if commit or tag or kacl_config.git_create_commit() or kacl_config.git_create_tag():
+            if commit or tag or kacl_config.git_create_commit or kacl_config.git_create_tag:
                 vcs_context = {
                     "latest_version": latest_version,
                     "new_version": new_version,
@@ -271,9 +271,9 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
                 vcs_context.update(time_context)
                 vcs_context.update(prefixed_environ())
 
-                commit_message  = commit_message if commit_message != None else kacl_config.git_commit_message()
-                tag_name        = tag_name if tag_name != None else kacl_config.git_tag_name()
-                tag_description = tag_description if tag_description != None else kacl_config.git_tag_description()
+                commit_message  = commit_message if commit_message != None else kacl_config.git_commit_message
+                tag_name        = tag_name if tag_name != None else kacl_config.git_tag_name
+                tag_description = tag_description if tag_description != None else kacl_config.git_tag_description
 
                 repo = None
                 try:
@@ -287,13 +287,13 @@ def release(ctx, version, modify, link, auto_link, commit, no_commit, commit_mes
                         click.echo(click.style("Error: ", fg='red') +
                                 f"Repository is marked 'dirty'. Use --allow-dirty if you want to commit/tag on a dirty repository")
 
-                    if commit or kacl_config.git_create_commit():
-                        repo.git.add(kacl_config.changelog_file_path())
-                        for f in kacl_config.git_commit_additional_files():
+                    if commit or kacl_config.git_create_commit:
+                        repo.git.add(kacl_config.changelog_file_path)
+                        for f in kacl_config.git_commit_additional_files:
                             repo.git.add(f)
                         repo.git.commit('-m', commit_message.format(**vcs_context))
 
-                    if tag or kacl_config.git_create_tag():
+                    if tag or kacl_config.git_create_tag:
                         repo.create_tag(tag_name.format(**vcs_context),
                                         message=tag_description.format(**vcs_context))
     else:

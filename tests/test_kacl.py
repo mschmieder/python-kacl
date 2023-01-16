@@ -192,7 +192,6 @@ class TestKacl(TestCase):
             "major": "2.0.0",
             "minor": "1.1.0",
             "patch": "1.0.1",
-            "post": "1.0.0-post.1"
         }
         changelog_file = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), "data/CHANGELOG.md")
@@ -206,6 +205,41 @@ class TestKacl(TestCase):
             self.assertTrue(changelog.has_changes())
             changelog.release(increment = increment)
             self.assertEqual(expected_version, changelog.current_version())
+
+        fail_tests = {
+            "post": "1.0.0-post.1"
+        }
+
+        for increment, expected_version in fail_tests.items():
+            changelog = kacl.load(changelog_file)
+
+            msg = 'This is my first added change'
+            changelog.add('Added', msg)
+
+            self.assertTrue(changelog.has_changes())
+            self.assertRaises(kacl.KACLException, changelog.release, increment=increment)
+
+    def test_release_with_increment_extension(self):
+        tests = {
+            "major": "2.0.0",
+            "minor": "1.1.0",
+            "patch": "1.0.1",
+            "post": "1.0.0-post.1"
+        }
+        changelog_file = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "data/CHANGELOG.md")
+
+        for increment, expected_version in tests.items():
+            changelog = kacl.load(changelog_file)
+            changelog.config.post_release_version_prefix = 'post'
+
+            msg = 'This is my first added change'
+            changelog.add('Added', msg)
+
+            self.assertTrue(changelog.has_changes())
+            changelog.release(increment = increment)
+            self.assertEqual(expected_version, changelog.current_version())
+
 
     def test_post_release_with_increment(self):
         tests = {
@@ -253,14 +287,14 @@ class TestKacl(TestCase):
         # git:
         #   commit: False
 
-        self.assertNotEqual(kacl_config.allowed_header_titles(), default_config['allowed_header_titles'] )
-        self.assertEqual(kacl_config.allowed_header_titles(), ['ChangeLog'] )
+        self.assertNotEqual(kacl_config.allowed_header_titles, default_config['allowed_header_titles'] )
+        self.assertEqual(kacl_config.allowed_header_titles, ['ChangeLog'] )
 
-        self.assertNotEqual(kacl_config.allowed_version_sections(), default_config['allowed_version_sections'] )
-        self.assertEqual(kacl_config.allowed_version_sections(), ['Security'] )
+        self.assertNotEqual(kacl_config.allowed_version_sections, default_config['allowed_version_sections'] )
+        self.assertEqual(kacl_config.allowed_version_sections, ['Security'] )
 
         self.assertNotEqual(kacl_config.git_create_commit, default_config['git']['commit'] )
-        self.assertEqual(kacl_config.git_create_commit(), False )
+        self.assertEqual(kacl_config.git_create_commit, True )
 
 
     def test_link_generation(self):

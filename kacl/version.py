@@ -59,7 +59,7 @@ class KACLVersion(KACLElement):
         return self.__version
 
     def semver(self):
-        return semver.parse(self.version())
+        return semver.VersionInfo.parse(self.version())
 
     def set_version(self, version):
         self.__version = version
