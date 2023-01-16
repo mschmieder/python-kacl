@@ -14,11 +14,6 @@ version = re.search(r'^__version__\s*=\s*"(.*)"',
                     open('kacl/__init__.py').read(),
                     re.M).group(1)
 
-# read the requirements from requirements.txt
-requirements = []
-with pathlib.Path("requirements.txt").open() as requirements_txt:
-    requirements = [str(requirement) for requirement in pkg_resources.parse_requirements(requirements_txt)]
-
 setup(name='python-kacl',
       version=version,
       description='Python module and CLI tool for validating and modifying Changelogs in "keep-a-changelog" format"',
@@ -34,7 +29,12 @@ setup(name='python-kacl',
       packages=find_packages(),
       include_package_data=True,
       python_requires='>=3.6',
-      install_requires=requirements,
+      install_requires=[
+        'click',
+        'semver',
+        'gitpython',
+        'pyyaml'
+      ],
       zip_safe=False,
       classifiers= [
           "License :: OSI Approved :: MIT License",
