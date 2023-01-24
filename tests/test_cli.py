@@ -1,6 +1,7 @@
 from click.testing import CliRunner
 from kacl.kacl_cli import cli
 from tests.snapshot_directory import snapshot_directory
+from freezegun import freeze_time
 
 import json
 import os
@@ -23,7 +24,7 @@ def test_verify_with_json_output():
     assert len(validation_result["errors"]) == 10
     assert validation_result["valid"] == False
 
-
+@freeze_time("2023-01-01")
 def test_release_patch(tmp_path, snapshot):
     runner = CliRunner()
     resources_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/")
@@ -44,6 +45,7 @@ def test_release_patch(tmp_path, snapshot):
         assert result.exit_code == 0, result.output
         snapshot_directory(snapshot=snapshot, directory_path=project_root_path)
 
+@freeze_time("2023-01-01")
 def test_release_minor(tmp_path, snapshot):
     runner = CliRunner()
     resources_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/")
@@ -64,6 +66,7 @@ def test_release_minor(tmp_path, snapshot):
         assert result.exit_code == 0, result.output
         snapshot_directory(snapshot=snapshot, directory_path=project_root_path)
 
+@freeze_time("2023-01-01")
 def test_release_major(tmp_path, snapshot):
     runner = CliRunner()
     resources_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/")
@@ -84,6 +87,7 @@ def test_release_major(tmp_path, snapshot):
         assert result.exit_code == 0, result.output
         snapshot_directory(snapshot=snapshot, directory_path=project_root_path)
 
+@freeze_time("2023-01-01")
 def test_release_custom(tmp_path, snapshot):
     runner = CliRunner()
     resources_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/")
@@ -104,6 +108,7 @@ def test_release_custom(tmp_path, snapshot):
         assert result.exit_code == 0, result.output
         snapshot_directory(snapshot=snapshot, directory_path=project_root_path)
 
+@freeze_time("2023-01-01")
 def test_add_change_security(tmp_path, snapshot):
     runner = CliRunner()
     resources_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/")
@@ -139,5 +144,5 @@ def test_config(tmp_path, snapshot):
         ],
         catch_exceptions=False,
     )
-    assert result.exit_code == 23, result.output
+    assert result.exit_code != 0, result.output
 

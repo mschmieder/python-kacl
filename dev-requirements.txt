@@ -5,3 +5,4 @@ pytest-cov
 pytest-dotenv
 pytest-snapshot
 pytest-xdist
+freezegun
