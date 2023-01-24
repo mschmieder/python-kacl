@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.3.4] - 2023-01-24
 ### Fixed
 - fixed issue, where config was not loaded correctly when passend by `-c,--config`
 
@@ -111,7 +113,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - implemented basic cli with `new`, `get`, `release`, `verify`
 - added `--json` option to `verify` command
 
-[Unreleased]: https://github.com/mschmieder/python-kacl.git/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/mschmieder/python-kacl.git/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/mschmieder/python-kacl.git/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/mschmieder/python-kacl.git/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/mschmieder/python-kacl.git/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/mschmieder/python-kacl.git/compare/v0.2.29...v0.3.1
