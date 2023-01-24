@@ -125,3 +125,19 @@ def test_add_change_security(tmp_path, snapshot):
         assert result.exit_code == 0, result.output
         snapshot_directory(snapshot=snapshot, directory_path=project_root_path)
 
+
+def test_config(tmp_path, snapshot):
+    runner = CliRunner()
+    resources_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data/")
+
+    result = runner.invoke(
+        cli,
+        [
+            '-c', os.path.join(resources_dir, 'config.yml'),
+            '-f', 'CHANGELOG.md',
+            'verify'
+        ],
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 23, result.output
+

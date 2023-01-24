@@ -15,12 +15,14 @@ from datetime import datetime
 from kacl.exception import KACLException
 
 def load_changelog(ctx):
-    config = ctx.obj['config']
+    config_file_path = ctx.obj['config']
     file = ctx.obj['file']
 
     default_config_path = os.path.join(os.getcwd(), '.kacl.yml')
-    if not config and os.path.exists(default_config_path):
+    if not config_file_path and os.path.exists(default_config_path):
         kacl_config = kacl.KACLConfig(default_config_path)
+    elif config_file_path:
+        kacl_config = kacl.KACLConfig(config_file_path)
     else:
         kacl_config = kacl.KACLConfig()
 
