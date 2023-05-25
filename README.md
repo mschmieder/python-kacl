@@ -1,5 +1,8 @@
 # python-kacl
 
+> **ATTENTION: This projects has moved to GitLab. Please use the following link https://gitlab.com/schmieder.matthias/python-kacl**
+
+
 [![Build Status](https://travis-ci.org/mschmieder/python-kacl.svg?branch=master)](https://travis-ci.org/mschmieder/python-kacl)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mschmieder_python-kacl&metric=coverage)](https://sonarcloud.io/dashboard?id=mschmieder_python-kacl)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=mschmieder_python-kacl&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=mschmieder_python-kacl)
